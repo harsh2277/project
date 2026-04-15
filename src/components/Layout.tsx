@@ -7,7 +7,7 @@ import {
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = false, isCollapsed = false, path }: any) => {
+const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = false, isCollapsed = false, path, onPlusClick }: any) => {
   const navigate = useNavigate();
   return (
     <div 
@@ -25,7 +25,13 @@ const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = f
         </span>
       )}
       {!isCollapsed && hasDropdown && (
-        <Plus size={16} className="text-slate-400" />
+        <button
+          onClick={(e) => { e.stopPropagation(); onPlusClick?.(); }}
+          className="p-0.5 rounded-md hover:bg-violet-100 hover:text-violet-600 transition-colors text-slate-400"
+          title="Add Task"
+        >
+          <Plus size={16} />
+        </button>
       )}
     </div>
   );
@@ -39,7 +45,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex h-screen bg-[#F0F4F9] overflow-hidden font-sans">
       {/* Left Sidebar */}
-      <aside className={`${isSidebarCollapsed ? 'w-20' : 'w-64'} transition-all duration-300 bg-white flex flex-col border-r border-slate-100 shrink-0 h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-10`}>
+      <aside className={`${isSidebarCollapsed ? 'w-20' : 'w-64'} transition-all duration-300 bg-white flex flex-col border-r border-slate-100 shrink-0 h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)]`}>
         <div className={`py-6 flex items-center ${isSidebarCollapsed ? 'flex-col gap-4 px-2 justify-center' : 'gap-2 px-6'}`}>
           <div className="text-violet-600 bg-violet-100 p-1.5 rounded-lg shrink-0">
             <Zap size={24} fill="currentColor" />
@@ -53,7 +59,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-1">
               <SidebarItem icon={LayoutDashboard} label="Dashboard" active={location.pathname === '/dashboard'} path="/dashboard" isCollapsed={isSidebarCollapsed} />
               <SidebarItem icon={FolderDot} label="Projects" active={location.pathname === '/projects'} path="/projects" isCollapsed={isSidebarCollapsed} />
-              <SidebarItem icon={CheckSquare} label="Tasks" hasDropdown isCollapsed={isSidebarCollapsed} />
+              <SidebarItem icon={CheckSquare} label="Tasks" hasDropdown isCollapsed={isSidebarCollapsed} path="/tasks" active={location.pathname === '/tasks'} onPlusClick={() => window.dispatchEvent(new CustomEvent('openAddTask'))} />
               <SidebarItem icon={Calendar} label="Calendar" isCollapsed={isSidebarCollapsed} />
               <SidebarItem icon={Users} label="Teams" isCollapsed={isSidebarCollapsed} />
             </div>
@@ -97,7 +103,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-full bg-[#f8fafc] overflow-hidden relative z-0">
+      <main className="flex-1 flex flex-col h-full bg-[#f8fafc] overflow-hidden">
         {/* Header */}
         <header className="p-[12px] bg-white border-b border-slate-100 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-5">

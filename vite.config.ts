@@ -9,6 +9,7 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] })
   ],
   server: {
+    port: 3000,
     allowedHosts: [
       'express-frantic-impurity.ngrok-free.dev'
     ]
