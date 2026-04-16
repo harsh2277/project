@@ -40,7 +40,6 @@ const INITIAL_APPS = [
     bg: 'bg-primary-light',
     status: 'disconnected',
     category: 'Management',
-    // jiraToken: 'ATATT3xFfGF0LzFqgUr1lxvb1Tp5GYnGMqz_T0xgkCkIuAm0EzzxsZrLJ7YAUHD6EEadJTTd9zZt30uqSkLEao00scJ0Gzl3Tbs21r6FdMG9TTtha_ZE68qoPuJIEKSHWw_-t2KpFbLwU0S_PUsq-pdsPWB9-0ObdaoMATxpttEKdTpOje_2S5o=AB30D476'
   }
 ];
 
