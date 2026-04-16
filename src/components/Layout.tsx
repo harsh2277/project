@@ -3,22 +3,36 @@ import {
   LayoutDashboard, FolderDot, CheckSquare, Calendar,
   Zap, Settings, Search, BarChart3,
   Bell, PanelLeftClose, PanelLeftOpen, User, LogOut, ChevronDown, Plus,
-  Timer, FileText, Plug
+  Timer, FileText, Plug, Sun, Moon
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTheme } from './ThemeContext';
 
 const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = false, isCollapsed = false, path, onPlusClick }: any) => {
   const navigate = useNavigate();
   return (
-    <div 
-      className={`flex items-center ${isCollapsed ? 'justify-center mx-2' : 'justify-between px-4'} py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${active ? 'bg-violet-100/50 text-violet-700 font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 font-medium'}`}
+    <div
+      className={`flex items-center ${isCollapsed ? 'justify-center mx-2' : 'justify-between px-4'} py-2.5 rounded-xl cursor-pointer transition-all duration-200`}
+      style={
+        active
+          ? { backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }
+          : undefined
+      }
       title={isCollapsed ? label : undefined}
       onClick={() => path && navigate(path)}
     >
       <div className={`flex items-center ${isCollapsed ? '' : 'gap-3'}`}>
-        <Icon size={20} className={active ? 'text-violet-600' : 'text-slate-400'} />
-        {!isCollapsed && <span className="text-sm">{label}</span>}
+        <Icon
+          size={20}
+          style={{ color: active ? 'var(--primary)' : undefined }}
+          className={active ? '' : 'text-slate-400'}
+        />
+        {!isCollapsed && (
+          <span className={`text-sm font-${active ? 'semibold' : 'medium'}`} style={active ? { color: 'var(--primary)' } : { color: 'var(--text-muted)' }}>
+            {label}
+          </span>
+        )}
       </div>
       {!isCollapsed && badge && (
         <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
@@ -28,7 +42,8 @@ const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = f
       {!isCollapsed && hasDropdown && (
         <button
           onClick={(e) => { e.stopPropagation(); onPlusClick?.(); }}
-          className="p-0.5 rounded-md hover:bg-violet-100 hover:text-violet-600 transition-colors text-slate-400"
+          className="p-0.5 rounded-md transition-colors text-slate-400 hover:text-slate-700"
+          style={{ '--hover-color': 'var(--primary)' } as any}
           title="Add Task"
         >
           <Plus size={16} />
@@ -42,19 +57,28 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = React.useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="flex h-screen bg-[#f5f5f5] overflow-hidden font-sans">
+    <div className="flex h-screen overflow-hidden font-sans" style={{ backgroundColor: 'var(--bg-page)' }}>
       {/* Left Sidebar */}
-      <aside className={`${isSidebarCollapsed ? 'w-20' : 'w-64'} transition-all duration-300 bg-white flex flex-col border-r border-slate-100 shrink-0 h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)]`}>
+      <aside
+        className={`${isSidebarCollapsed ? 'w-20' : 'w-64'} transition-all duration-300 flex flex-col shrink-0 h-full`}
+        style={{ backgroundColor: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-subtle)' }}
+      >
+        {/* Logo */}
         <div className={`py-6 flex items-center ${isSidebarCollapsed ? 'flex-col gap-4 px-2 justify-center' : 'gap-2 px-6'}`}>
-          <div className="text-violet-600 bg-violet-100 p-1.5 rounded-lg shrink-0">
+          <div className="p-1.5 rounded-lg shrink-0" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
             <Zap size={24} fill="currentColor" />
           </div>
-          {!isSidebarCollapsed && <span className="text-xl font-bold tracking-tight text-slate-800 transition-shadow">ProFlow</span>}
+          {!isSidebarCollapsed && (
+            <span className="text-xl font-bold tracking-tight" style={{ color: 'var(--text-main)' }}>ProFlow</span>
+          )}
         </div>
 
-        <div className={`flex-1 overflow-y-auto ${isSidebarCollapsed ? 'px-2' : 'px-4'} space-y-8 pb-6 custom-scrollbar`}>
+        {/* Nav Items */}
+        <div className={`flex-1 overflow-y-auto ${isSidebarCollapsed ? 'px-2' : 'px-4'} space-y-8 pb-6`}>
           <div>
             <div className="space-y-1">
               <SidebarItem icon={LayoutDashboard} label="Dashboard" active={location.pathname === '/dashboard'} path="/dashboard" isCollapsed={isSidebarCollapsed} />
@@ -63,72 +87,111 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <SidebarItem icon={Calendar} label="Calendar" path="/calendar" active={location.pathname === '/calendar'} isCollapsed={isSidebarCollapsed} />
               <SidebarItem icon={Timer} label="Timer" path="/timer" active={location.pathname === '/timer'} isCollapsed={isSidebarCollapsed} />
               <SidebarItem icon={FileText} label="Timesheet" path="/timesheet" active={location.pathname === '/timesheet'} isCollapsed={isSidebarCollapsed} />
-              <SidebarItem icon={BarChart3} label="Reports" path="/reports" active={location.pathname === '/reports'} isCollapsed={isSidebarCollapsed} />
               <SidebarItem icon={Plug} label="Integrations" path="/integrations" active={location.pathname === '/integrations'} isCollapsed={isSidebarCollapsed} />
             </div>
           </div>
         </div>
 
-        <div className={`p-4 mt-auto border-t border-slate-100`}>
+        {/* Bottom Section */}
+        <div className="p-4 mt-auto" style={{ borderTop: '1px solid var(--border-subtle)' }}>
           {!isSidebarCollapsed && (
-            <div className="bg-violet-50 rounded-2xl p-4 flex flex-col gap-1 mb-4 relative overflow-hidden group hover:translate-y-[-2px] transition-transform cursor-pointer border border-violet-100">
-              <div className="absolute top-0 right-0 p-4 opacity-10 text-violet-600">
+            <div
+              className="rounded-2xl p-4 flex flex-col gap-1 mb-4 relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-0.5"
+              style={{
+                backgroundColor: 'var(--primary-light)',
+                border: '1px solid var(--primary-muted)',
+              }}
+            >
+              <div className="absolute top-0 right-0 p-4 opacity-10" style={{ color: 'var(--primary)' }}>
                 <Zap size={48} className="transform rotate-12" />
               </div>
-              <div className="flex items-center gap-2 text-violet-700 font-bold z-10">
+              <div className="flex items-center gap-2 font-bold z-10" style={{ color: 'var(--primary)' }}>
                 <Zap size={16} fill="currentColor" /> Activate Premium
               </div>
-              <p className="text-xs text-slate-500 font-medium z-10">Unlock all features on ProFlow</p>
+              <p className="text-xs font-medium z-10 text-slate-500">Unlock all features on ProFlow</p>
             </div>
           )}
 
-          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center mx-2' : 'gap-3 px-4'} py-2 text-slate-500 hover:text-slate-800 font-medium cursor-pointer transition-colors`} title={isSidebarCollapsed ? "Menu Settings" : undefined}>
-            <Settings size={20} />
-            {!isSidebarCollapsed && <span className="text-sm">Menu Settings</span>}
+          {/* Theme Toggle */}
+          <div
+            onClick={toggleTheme}
+            className={`flex items-center ${isSidebarCollapsed ? 'justify-center mx-2' : 'gap-3 px-4'} py-2 rounded-xl cursor-pointer transition-all mb-1`}
+            style={{ color: 'var(--text-muted)' }}
+            title={isSidebarCollapsed ? 'Toggle Theme' : undefined}
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            {!isSidebarCollapsed && <span className="text-sm font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>}
+          </div>
+
+          {/* Settings */}
+          <div
+            onClick={() => navigate('/settings')}
+            className={`flex items-center ${isSidebarCollapsed ? 'justify-center mx-2' : 'gap-3 px-4'} py-2 rounded-xl transition-all duration-200 cursor-pointer`}
+            style={
+              location.pathname === '/settings'
+                ? { backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }
+                : { color: 'var(--text-muted)' }
+            }
+            title={isSidebarCollapsed ? 'Menu Settings' : undefined}
+          >
+            <Settings size={20} style={{ color: location.pathname === '/settings' ? 'var(--primary)' : undefined }} />
+            {!isSidebarCollapsed && <span className="text-sm font-medium">Menu Settings</span>}
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-full bg-[#f5f5f5] overflow-hidden">
+      <main className="flex-1 flex flex-col h-full overflow-hidden" style={{ backgroundColor: 'var(--bg-page)' }}>
         {/* Header */}
-        <header className="p-[12px] bg-white border-b border-slate-100 flex items-center justify-between shrink-0">
+        <header
+          className="p-[12px] flex items-center justify-between shrink-0"
+          style={{ backgroundColor: 'var(--bg-sidebar)', borderBottom: '1px solid var(--border-subtle)' }}
+        >
           <div className="flex items-center gap-5">
-            <div 
-              className="p-2 border border-slate-200 rounded-xl text-slate-500 cursor-pointer hover:bg-slate-50 hover:text-slate-800 transition-colors shrink-0 bg-white"
+            <div
+              className="p-2 rounded-xl cursor-pointer transition-colors shrink-0"
+              style={{ border: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-card)', color: 'var(--text-muted)' }}
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
               title="Toggle Sidebar"
             >
               {isSidebarCollapsed ? <PanelLeftOpen size={20} strokeWidth={2} /> : <PanelLeftClose size={20} strokeWidth={2} />}
             </div>
-            
-            <div className="flex items-center bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl w-96 hover:shadow-sm focus-within:shadow-sm focus-within:border-violet-200 transition-all focus-within:bg-white text-slate-500">
+
+            <div
+              className="flex items-center px-4 py-2 rounded-xl w-96 transition-all"
+              style={{ backgroundColor: 'var(--bg-page)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}
+            >
               <Search size={18} className="mr-2 opacity-50" />
               <input
                 type="text"
                 placeholder="Search insights..."
-                className="bg-transparent outline-none text-sm font-medium w-full text-slate-700 placeholder:font-normal placeholder:text-slate-400"
+                className="bg-transparent outline-none text-sm font-medium w-full placeholder:font-normal"
+                style={{ color: 'var(--text-main)' }}
               />
             </div>
           </div>
+
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <button className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 hover:text-violet-600 transition-colors relative">
-                <div className="absolute top-2.5 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></div>
-                <Bell size={18} />
-              </button>
-            </div>
+            {/* Bell */}
+            <button
+              className="w-10 h-10 rounded-xl flex items-center justify-center relative transition-colors"
+              style={{ backgroundColor: 'var(--bg-page)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}
+            >
+              <div className="absolute top-2.5 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-black"></div>
+              <Bell size={18} />
+            </button>
 
-            <div className="h-8 w-[1px] bg-slate-200"></div>
+            <div className="h-8 w-[1px]" style={{ backgroundColor: 'var(--border-subtle)' }}></div>
 
+            {/* Profile */}
             <div className="relative">
-              <div 
-                className="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-1.5 rounded-xl transition-colors"
+              <div
+                className="flex items-center gap-3 cursor-pointer p-1.5 rounded-xl transition-colors"
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               >
                 <div className="text-right hidden md:block">
-                  <p className="text-sm font-bold text-slate-800 leading-tight">Shakib Ali</p>
-                  <p className="text-xs text-slate-400 font-medium">Designer</p>
+                  <p className="text-sm font-bold leading-tight" style={{ color: 'var(--text-main)' }}>Shakib Ali</p>
+                  <p className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Designer</p>
                 </div>
                 <img src="https://ui-avatars.com/api/?name=Shakib+Ali&background=FBBF24&color=fff" alt="User" className="w-10 h-10 rounded-xl" />
                 <ChevronDown size={16} className={`text-slate-400 ml-1 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
@@ -136,21 +199,19 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
               {isProfileMenuOpen && (
                 <>
-                  <div 
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsProfileMenuOpen(false)}
-                  ></div>
-                  <motion.div 
+                  <div className="fixed inset-0 z-40" onClick={() => setIsProfileMenuOpen(false)}></div>
+                  <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="absolute top-full right-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] z-50 py-2 overflow-hidden"
+                    className="absolute top-full right-0 mt-2 w-48 rounded-2xl shadow-xl z-50 py-2 overflow-hidden"
+                    style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)' }}
                   >
-                    <div className="px-4 py-2.5 hover:bg-slate-50 cursor-pointer flex items-center gap-3 text-sm font-semibold text-slate-700 transition-colors">
-                      <User size={16} className="text-slate-400" />
+                    <div className="px-4 py-2.5 cursor-pointer flex items-center gap-3 text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--text-main)' }}>
+                      <User size={16} style={{ color: 'var(--text-muted)' }} />
                       Profile
                     </div>
-                    <div className="h-px bg-slate-100 my-1"></div>
-                    <div className="px-4 py-2.5 hover:bg-rose-50 cursor-pointer flex items-center gap-3 text-sm font-semibold text-rose-600 transition-colors">
+                    <div className="h-px my-1" style={{ backgroundColor: 'var(--border-subtle)' }}></div>
+                    <div className="px-4 py-2.5 cursor-pointer flex items-center gap-3 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950">
                       <LogOut size={16} />
                       Logout
                     </div>
@@ -162,7 +223,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         {/* Dynamic Content */}
-        <div className="flex-1 overflow-y-auto p-[18px] custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-[18px]">
           <div className="w-full">
             {children}
           </div>

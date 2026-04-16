@@ -9,6 +9,8 @@ import Tasks from './pages/Tasks';
 import CalendarPage from './pages/Calendar';
 import TimerPage from './pages/Timer';
 import TimesheetPage from './pages/Timesheet';
+import Integrations from './pages/Integrations';
+import Settings from './pages/Settings';
 import './App.css';
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/timer" element={<TimerPage />} />
         <Route path="/timesheet" element={<TimesheetPage />} />
+        <Route path="/integrations" element={<Integrations />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </Router>
   );

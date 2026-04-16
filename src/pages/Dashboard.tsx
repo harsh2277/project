@@ -107,11 +107,11 @@ const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }
       bgClasses = "text-slate-300";
     } else if (day.sel) {
       if (day.sel === 'start-only') {
-        bgClasses = "bg-blue-600 text-white rounded-md relative z-10";
+        bgClasses = "bg-primary text-white rounded-md relative z-10";
       } else if (day.sel === 'start') {
-        bgClasses = "bg-blue-600 text-white rounded-l-md rounded-r-none relative z-10";
+        bgClasses = "bg-primary text-white rounded-l-md rounded-r-none relative z-10";
       } else if (day.sel === 'mid') {
-        bgClasses = "bg-blue-500 text-white rounded-none relative z-10";
+        bgClasses = "bg-primary text-white rounded-none relative z-10";
       } else if (day.sel === 'end') {
         bgClasses = "bg-blue-800 text-white rounded-r-lg rounded-l-none relative z-10";
         innerContent = (
@@ -218,11 +218,11 @@ const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }
 
 const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = false, isCollapsed = false }: any) => (
   <div
-    className={`flex items-center ${isCollapsed ? 'justify-center mx-2' : 'justify-between px-4'} py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${active ? 'bg-violet-100/50 text-violet-700 font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 font-medium'}`}
+    className={`flex items-center ${isCollapsed ? 'justify-center mx-2' : 'justify-between px-4'} py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${active ? 'bg-violet-100/50 text-primary font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 font-medium'}`}
     title={isCollapsed ? label : undefined}
   >
     <div className={`flex items-center ${isCollapsed ? '' : 'gap-3'}`}>
-      <Icon size={20} className={active ? 'text-violet-600' : 'text-slate-400'} />
+      <Icon size={20} className={active ? 'text-primary' : 'text-slate-400'} />
       {!isCollapsed && <span className="text-sm">{label}</span>}
     </div>
     {!isCollapsed && badge && (
@@ -240,7 +240,7 @@ const StatCard = ({ icon: Icon, title, value, change, isPositive }: any) => (
   <div className="bg-white p-5 rounded-2xl border border-[#f5f5f5] flex flex-col justify-between">
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
+        <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center text-primary">
           <Icon size={20} />
         </div>
         <span className="text-sm font-semibold text-slate-500">{title}</span>
@@ -287,19 +287,18 @@ const BarChartMockup = () => {
             {/* Tooltip mockup for active bar */}
             <div className={`absolute top-0 bg-white p-2 rounded-lg shadow-lg border border-slate-100 text-xs z-20 w-24 transition-all duration-200 transform pointer-events-none ${isActive ? 'opacity-100 -translate-y-1' : 'opacity-0 translate-y-0'}`}>
               <p className="text-slate-400 mb-1">Working</p>
-              <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-sm bg-violet-600"></div> Tracked: {item.tracked}</div>
-              <div className="flex items-center gap-1 mt-1"><div className="w-2 h-2 rounded-sm bg-violet-200"></div> Manual: {item.manual}</div>
+              <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-sm bg-primary"></div> Tracked: {item.tracked}</div>
+              <div className="flex items-center gap-1 mt-1"><div className="w-2 h-2 rounded-sm bg-slate-300"></div> Manual: {item.manual}</div>
             </div>
-            <div className={`w-8 flex flex-col justify-end rounded-t-sm rounded-b-md overflow-hidden relative flex-1 transition-colors ${isActive ? 'bg-slate-100 shadow-md' : 'bg-slate-50'}`}>
+            <div className={`w-8 flex flex-col justify-end rounded-t-sm rounded-b-md overflow-hidden relative flex-1 transition-colors ${isActive ? 'bg-slate-100' : 'bg-slate-50'}`}>
               <motion.div
-                className="w-full bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,#d8b4fe_2px,#d8b4fe_4px)] transition-all"
-                style={{ opacity: 0.6 }}
+                className="w-full bg-primary-light transition-all"
                 initial={{ height: 0 }}
                 animate={{ height: `${item.manual}%` }}
                 transition={{ duration: 1, delay: i * 0.05 }}
               ></motion.div>
               <motion.div
-                className={`w-full rounded-b-md transition-all ${isActive ? 'bg-violet-500 ring-2 ring-violet-300 ring-offset-2' : 'bg-violet-600'}`}
+                className="w-full rounded-b-md transition-all bg-primary"
                 initial={{ height: 0 }}
                 animate={{ height: `${item.tracked}%` }}
                 transition={{ duration: 1, delay: i * 0.05 }}
@@ -307,7 +306,7 @@ const BarChartMockup = () => {
                 <div className={`w-2 h-2 bg-white rounded-full mx-auto mt-1 transition-opacity ${isActive ? 'opacity-100' : 'opacity-0'}`}></div>
               </motion.div>
             </div>
-            <span className={`text-xs font-semibold transition-colors ${isActive ? 'text-violet-600' : 'text-slate-400'}`}>{item.month}</span>
+            <span className={`text-xs font-semibold transition-colors ${isActive ? 'text-primary' : 'text-slate-400'}`}>{item.month}</span>
           </div>
         );
       })}
@@ -326,7 +325,7 @@ const DonutChartMockup = () => {
           <motion.circle
             onMouseEnter={() => setActiveSegment('late')}
             onMouseLeave={() => setActiveSegment(null)}
-            cx="50" cy="50" r="40" fill="transparent" stroke="#E2E8F0"
+            cx="50" cy="50" r="40" fill="transparent" stroke="#cccccc"
             initial={{ pathLength: 0, strokeWidth: 16 }}
             animate={{ pathLength: 0.185, strokeWidth: activeSegment === 'late' ? 22 : 16 }}
             transition={{ duration: activeSegment ? 0.2 : 1.5, ease: "easeOut" }}
@@ -334,12 +333,12 @@ const DonutChartMockup = () => {
             style={{ strokeLinecap: 'butt' }}
           />
         </g>
-        {/* 10% Pending (Light Purple) */}
+        {/* 10% Pending */}
         <g transform="rotate(72 50 50)">
           <motion.circle
             onMouseEnter={() => setActiveSegment('pending')}
             onMouseLeave={() => setActiveSegment(null)}
-            cx="50" cy="50" r="40" fill="transparent" stroke="#A78BFA"
+            cx="50" cy="50" r="40" fill="transparent" stroke="var(--primary-muted)"
             initial={{ pathLength: 0, strokeWidth: 16 }}
             animate={{ pathLength: 0.085, strokeWidth: activeSegment === 'pending' ? 22 : 16 }}
             transition={{ duration: activeSegment ? 0.2 : 1.5, ease: "easeOut" }}
@@ -347,12 +346,12 @@ const DonutChartMockup = () => {
             style={{ strokeLinecap: 'butt' }}
           />
         </g>
-        {/* 70% Done (Dark Purple) */}
+        {/* 70% Done */}
         <g transform="rotate(108 50 50)">
           <motion.circle
             onMouseEnter={() => setActiveSegment('done')}
             onMouseLeave={() => setActiveSegment(null)}
-            cx="50" cy="50" r="40" fill="transparent" stroke="#7C3AED"
+            cx="50" cy="50" r="40" fill="transparent" stroke="var(--primary)"
             initial={{ pathLength: 0, strokeWidth: 16 }}
             animate={{ pathLength: 0.685, strokeWidth: activeSegment === 'done' ? 22 : 16 }}
             transition={{ duration: activeSegment ? 0.2 : 1.5, ease: "easeOut" }}
@@ -412,8 +411,8 @@ const LineChartMockup = () => {
         {/* Booked Hours (Orange) */}
         <motion.path whileHover={{ strokeWidth: 5 }} d="M0,150 C100,100 200,180 300,140 C400,100 500,40 600,100 C700,160 800,40 900,50 C950,55 1000,80 1000,80" fill="none" stroke="#F97316" strokeWidth="3" vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, ease: "easeInOut" }} className="transition-all" />
 
-        {/* Available (Purple) */}
-        <motion.path whileHover={{ strokeWidth: 5 }} d="M0,180 C100,160 200,90 300,60 C400,30 500,130 600,150 C700,170 800,120 900,100 C950,90 1000,110 1000,110" fill="none" stroke="#7C3AED" strokeWidth="3" vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, ease: "easeInOut", delay: 0.2 }} className="transition-all" />
+        {/* Available */}
+        <motion.path whileHover={{ strokeWidth: 5 }} d="M0,180 C100,160 200,90 300,60 C400,30 500,130 600,150 C700,170 800,120 900,100 C950,90 1000,110 1000,110" fill="none" stroke="var(--primary)" strokeWidth="3" vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, ease: "easeInOut", delay: 0.2 }} className="transition-all" />
       </svg>
 
       {/* Tooltip Tracking */}
@@ -436,7 +435,7 @@ const LineChartMockup = () => {
               <span className="font-bold text-slate-700">{currentData.booked}</span>
             </div>
             <div className="flex justify-between">
-              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-violet-600"></div> Available :</div>
+              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-primary"></div> Available :</div>
               <span className="font-bold text-slate-700">{currentData.available}</span>
             </div>
           </div>
@@ -520,10 +519,10 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 mb-4">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full border-2 border-violet-600"></div> Tracked
+                  <div className="w-3 h-3 rounded-full bg-primary"></div> Tracked
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full border-2 border-slate-200"></div> Manual
+                  <div className="w-3 h-3 rounded-full bg-primary-light border border-slate-200"></div> Manual
                 </div>
               </div>
 
@@ -550,11 +549,11 @@ const Dashboard: React.FC = () => {
 
               <div className="flex items-center justify-around mt-8 border-t border-slate-100 pt-6 px-4 shrink-0">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-violet-600"></div>
+                  <div className="w-3 h-3 rounded-full bg-primary"></div>
                   <span className="text-sm font-semibold text-slate-600">8 Done</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-violet-400"></div>
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--primary-muted)' }}></div>
                   <span className="text-sm font-semibold text-slate-600">4 Pending</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -603,7 +602,7 @@ const Dashboard: React.FC = () => {
                       <td className="py-3 px-4 rounded-l-xl">Brainbubble Research</td>
                       <td className="py-3 px-4">Nov 23, 2024</td>
                       <td className="py-3 px-4 rounded-r-xl text-center">
-                        <span className="inline-block px-3 py-1.5 bg-indigo-50 text-indigo-600 text-[11px] rounded-lg font-bold w-full">In Progress</span>
+                        <span className="inline-block px-3 py-1.5 bg-primary-light text-primary text-[11px] rounded-lg font-bold w-full">In Progress</span>
                       </td>
                     </tr>
                     <tr className="bg-[#f5f5f5]/50">
@@ -639,7 +638,7 @@ const Dashboard: React.FC = () => {
 
               <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 mb-2 px-2 shrink-0">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full border-2 border-violet-600"></div> Available
+                  <div className="w-3 h-3 rounded-full border-2" style={{ borderColor: 'var(--primary)' }}></div> Available
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full border-2 border-orange-500"></div> Booked Hours

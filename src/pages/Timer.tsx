@@ -22,10 +22,10 @@ interface TimeEntry {
 
 /* ─── Mock Data ───────────────────────────────────────────────── */
 const MOCK_ENTRIES: TimeEntry[] = [
-  { id: 1, project: 'Figma Design System', task: 'Component Audit', description: 'Reviewing button variants & tokens', duration: '01:30:00', date: 'Today', startTime: '09:00 AM', endTime: '10:30 AM', color: 'bg-violet-500' },
-  { id: 2, project: 'BoostVibe 2.0', task: 'API Integration', description: 'Connecting payment gateway', duration: '02:15:00', date: 'Today', startTime: '11:00 AM', endTime: '01:15 PM', color: 'bg-blue-500' },
+  { id: 1, project: 'Figma Design System', task: 'Component Audit', description: 'Reviewing button variants & tokens', duration: '01:30:00', date: 'Today', startTime: '09:00 AM', endTime: '10:30 AM', color: 'bg-primary' },
+  { id: 2, project: 'BoostVibe 2.0', task: 'API Integration', description: 'Connecting payment gateway', duration: '02:15:00', date: 'Today', startTime: '11:00 AM', endTime: '01:15 PM', color: 'bg-primary' },
   { id: 3, project: 'ProService Desk', task: 'Layout Fixes', description: 'Mobile responsiveness', duration: '01:00:00', date: 'Yesterday', startTime: '03:00 PM', endTime: '04:00 PM', color: 'bg-emerald-500' },
-  { id: 4, project: 'Figma Design System', task: 'Dark Mode', description: 'CSS variable mapping', duration: '00:45:00', date: 'Yesterday', startTime: '10:00 AM', endTime: '10:45 AM', color: 'bg-violet-500' },
+  { id: 4, project: 'Figma Design System', task: 'Dark Mode', description: 'CSS variable mapping', duration: '00:45:00', date: 'Yesterday', startTime: '10:00 AM', endTime: '10:45 AM', color: 'bg-primary' },
 ];
 
 const PROJECTS = ['Figma Design System', 'BoostVibe 2.0', 'ProService Desk', 'Internal Admin'];
@@ -40,8 +40,8 @@ const inputCls = "w-full px-4 py-2.5 bg-[#F5F5F5] border border-transparent roun
 const selectCls = inputCls + " appearance-none cursor-pointer";
 
 const projectColors: Record<string, string> = {
-  'Figma Design System': 'bg-violet-500',
-  'BoostVibe 2.0': 'bg-blue-500',
+  'Figma Design System': 'bg-primary',
+  'BoostVibe 2.0': 'bg-primary',
   'ProService Desk': 'bg-emerald-500',
   'Internal Admin': 'bg-amber-500',
 };
@@ -127,7 +127,7 @@ const TimerPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <div className="bg-white border border-[#F0F0F0] rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm">
-              <div className="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-violet-100 text-primary flex items-center justify-center">
                 <TrendingUp size={15} />
               </div>
               <div>
@@ -195,7 +195,7 @@ const TimerPage: React.FC = () => {
                 {!isRunning ? (
                   <button
                     onClick={handleStart}
-                    className="flex items-center gap-2.5 px-8 py-3.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-bold hover:bg-black transition-all shadow-lg shadow-black/10 hover:-translate-y-0.5"
+                    className="flex items-center gap-2.5 px-8 py-3.5 bg-primary text-white rounded-full text-[14px] font-bold hover:bg-primary-hover transition-all shadow-lg shadow-black/10 hover:-translate-y-0.5"
                   >
                     <Play size={16} fill="white" /> Start Timer
                   </button>
@@ -205,7 +205,7 @@ const TimerPage: React.FC = () => {
                       onClick={isPaused ? handleResume : handlePause}
                       className={`flex items-center gap-2.5 px-7 py-3.5 rounded-full text-[14px] font-bold transition-all hover:-translate-y-0.5 ${
                         isPaused
-                          ? 'bg-[#1A1A1A] text-white shadow-lg shadow-black/10'
+                          ? 'bg-primary text-white shadow-lg shadow-black/10'
                           : 'bg-[#F5F5F5] text-[#1A1A1A]'
                       }`}
                     >
@@ -276,7 +276,7 @@ const TimerPage: React.FC = () => {
             {/* Mini stats */}
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'Entries Today', value: entries.filter(e => e.date === 'Today').length.toString(), icon: <TimerIcon size={15} />, color: 'bg-violet-100 text-violet-600' },
+                { label: 'Entries Today', value: entries.filter(e => e.date === 'Today').length.toString(), icon: <TimerIcon size={15} />, color: 'bg-violet-100 text-primary' },
                 { label: 'Avg Per Entry', value: '1h 22m', icon: <Zap size={15} />, color: 'bg-amber-100 text-amber-600' },
               ].map(stat => (
                 <div key={stat.label} className="bg-white rounded-2xl border border-[#F0F0F0] p-4 shadow-sm">
@@ -300,7 +300,7 @@ const TimerPage: React.FC = () => {
                         initial={{ height: 0 }}
                         animate={{ height: barH }}
                         transition={{ delay: i * 0.06, duration: 0.5, ease: 'easeOut' }}
-                        className={`w-full rounded-t-md ${item.h === 0 ? 'bg-[#EEEEEE]' : 'bg-[#1A1A1A]'}`}
+                        className={`w-full rounded-t-md ${item.h === 0 ? 'bg-[#EEEEEE]' : 'bg-primary'}`}
                         style={{ minHeight: 4 }}
                       />
                       <span className="text-[10px] font-bold text-[#BBBBBB]">{item.d}</span>
@@ -315,8 +315,8 @@ const TimerPage: React.FC = () => {
               <p className="text-[12px] font-bold text-[#AAAAAA] uppercase tracking-wider mb-4">By Project</p>
               <div className="space-y-3.5">
                 {[
-                  { name: 'Figma Design System', hours: 12.5, color: 'bg-violet-500' },
-                  { name: 'BoostVibe 2.0', hours: 9, color: 'bg-blue-500' },
+                  { name: 'Figma Design System', hours: 12.5, color: 'bg-primary' },
+                  { name: 'BoostVibe 2.0', hours: 9, color: 'bg-primary' },
                   { name: 'ProService Desk', hours: 7, color: 'bg-emerald-500' },
                 ].map(p => (
                   <div key={p.name}>
@@ -348,7 +348,7 @@ const TimerPage: React.FC = () => {
             </div>
             <button
               onClick={() => setShowNewEntry(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] text-white rounded-full text-[13px] font-semibold hover:bg-black transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full text-[13px] font-semibold hover:bg-primary-hover transition-colors"
             >
               <Plus size={15} /> Add Manual Entry
             </button>
@@ -392,7 +392,7 @@ const TimerPage: React.FC = () => {
                         <button
                           onClick={() => handleContinue(entry)}
                           title="Continue this entry"
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 transition-all whitespace-nowrap"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold text-primary bg-primary-light hover:bg-violet-100 transition-all whitespace-nowrap"
                         >
                           <RotateCw size={13} /> Continue
                         </button>
@@ -452,7 +452,7 @@ const ManualEntryModal = ({ onClose, onAdd }: { onClose: () => void; onAdd: (e: 
       >
         <div className="flex items-center justify-between px-7 pt-7 pb-5 border-b border-[#F5F5F5]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[12px] bg-[#1A1A1A] text-white flex items-center justify-center">
+            <div className="w-9 h-9 rounded-[12px] bg-primary text-white flex items-center justify-center">
               <Plus size={17} />
             </div>
             <div>
@@ -506,7 +506,7 @@ const ManualEntryModal = ({ onClose, onAdd }: { onClose: () => void; onAdd: (e: 
           <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#666666] border border-[#EEEEEE] hover:bg-[#F5F5F5] transition-colors">Cancel</button>
           <button
             onClick={() => onAdd(form)}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-colors shadow-sm"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
           >
             <Plus size={15} /> Add Entry
           </button>

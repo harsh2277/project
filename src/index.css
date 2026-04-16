@@ -2,34 +2,164 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ════════════════════════════════════════════════════════
+   DESIGN TOKENS
+   Light  →  primary #003bff
+   Dark   →  primary #FF4D00 / bg #000000
+════════════════════════════════════════════════════════ */
+:root {
+  --primary:        #003bff;
+  --primary-hover:  #0030d4;
+  --primary-light:  rgba(0, 59, 255, 0.08);
+  --primary-muted:  rgba(0, 59, 255, 0.18);
+
+  --bg-page:        #f2f2f2;
+  --bg-sidebar:     #ffffff;
+  --bg-card:        #ffffff;
+  --bg-input:       #f5f5f5;
+  --text-main:      #1a1a1a;
+  --text-muted:     #666666;
+  --text-subtle:    #999999;
+  --border-subtle:  #e8e8e8;
+}
+
+.dark {
+  --primary:        #FF4D00;
+  --primary-hover:  #d94000;
+  --primary-light:  rgba(255, 77, 0, 0.10);
+  --primary-muted:  rgba(255, 77, 0, 0.20);
+
+  --bg-page:        #000000;
+  --bg-sidebar:     #0a0a0a;
+  --bg-card:        #111111;
+  --bg-input:       #1a1a1a;
+  --text-main:      #f0f0f0;
+  --text-muted:     #999999;
+  --text-subtle:    #555555;
+  --border-subtle:  #222222;
+}
+
+/* ════════════════════════════════════════════════════════
+   BASE  (no global transitions – keeps charts snappy)
+════════════════════════════════════════════════════════ */
 @layer base {
   body {
-    @apply bg-[#f5f5f5] text-slate-800 antialiased selection:bg-orange-100;
+    background-color: var(--bg-page);
+    color: var(--text-main);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
+/* ════════════════════════════════════════════════════════
+   PRIMARY UTILITY CLASSES
+   These are what the components now use after sed
+════════════════════════════════════════════════════════ */
+.bg-primary                        { background-color: var(--primary) !important; }
+.hover\:bg-primary-hover:hover     { background-color: var(--primary-hover) !important; }
+.bg-primary-light                  { background-color: var(--primary-light) !important; }
+.text-primary                      { color: var(--primary) !important; }
+.hover\:text-primary:hover         { color: var(--primary) !important; }
+.border-primary-light              { border-color: var(--primary-muted) !important; }
+.focus\:ring-primary-light:focus   { --tw-ring-color: var(--primary-muted); }
+.focus\:border-primary:focus       { border-color: var(--primary) !important; }
+
+/* ════════════════════════════════════════════════════════
+   LEGACY FALLBACK (any violet/blue/indigo not yet replaced)
+════════════════════════════════════════════════════════ */
+.bg-violet-600, .bg-violet-500,
+.bg-blue-600,   .bg-blue-500,
+.bg-indigo-600, .bg-indigo-500  { background-color: var(--primary) !important; }
+.text-violet-600, .text-violet-700,
+.text-blue-600,   .text-blue-700 { color: var(--primary) !important; }
+.bg-violet-50, .bg-violet-100,
+.bg-blue-50,   .bg-blue-100     { background-color: var(--primary-light) !important; }
+.hover\:bg-blue-700:hover,
+.hover\:bg-violet-700:hover      { background-color: var(--primary-hover) !important; }
+.border-violet-100, .border-blue-100 { border-color: var(--primary-muted) !important; }
+
+/* ════════════════════════════════════════════════════════
+   DARK MODE — Scoped to specific structural elements only.
+   Does NOT touch SVG, charts, or status-badge colors.
+════════════════════════════════════════════════════════ */
+
+/* ── Layout shells ── */
+.dark body                  { background-color: #000000; }
+.dark aside                 { background-color: var(--bg-sidebar) !important; border-right-color: var(--border-subtle) !important; }
+.dark header                { background-color: var(--bg-sidebar) !important; border-bottom-color: var(--border-subtle) !important; }
+
+/* ── Cards / panels: only div & section, NOT svg or canvas ── */
+.dark div.bg-white,
+.dark section.bg-white      { background-color: var(--bg-card) !important; }
+
+/* ── Table chrome ── */
+.dark thead tr              { background-color: #0d0d0d !important; }
+.dark tbody tr:hover        { background-color: #1a1a1a !important; }
+.dark table                 { color: var(--text-main); }
+.dark td, .dark th          { border-color: var(--border-subtle) !important; }
+
+/* ── Form inputs ── */
+.dark input:not([type="radio"]):not([type="checkbox"]),
+.dark textarea,
+.dark select {
+  background-color: var(--bg-input) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-subtle) !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: var(--text-subtle) !important; }
+
+/* ── Slate text utilities ── */
+.dark .text-slate-800 { color: #f0f0f0 !important; }
+.dark .text-slate-700 { color: #d0d0d0 !important; }
+.dark .text-slate-600 { color: #aaaaaa !important; }
+.dark .text-slate-500 { color: #888888 !important; }
+.dark .text-slate-400 { color: #666666 !important; }
+
+/* ── Slate / custom bg utilities ── */
+.dark .bg-slate-50          { background-color: #141414 !important; }
+.dark .bg-slate-100         { background-color: #1a1a1a !important; }
+.dark .bg-\[\#f5f5f5\]      { background-color: var(--bg-page) !important; }
+.dark .bg-\[\#F5F5F5\]      { background-color: var(--bg-input) !important; }
+.dark .bg-\[\#FAFAFA\]      { background-color: #0c0c0c !important; }
+
+/* ── Borders ── */
+.dark .border-slate-100     { border-color: var(--border-subtle) !important; }
+.dark .border-slate-200     { border-color: #2a2a2a !important; }
+.dark .border-\[\#EEEEEE\]  { border-color: var(--border-subtle) !important; }
+.dark .border-\[\#eeeeee\]  { border-color: var(--border-subtle) !important; }
+.dark .divide-\[\#EEEEEE\] > * + * { border-color: var(--border-subtle) !important; }
+.dark .divide-slate-100 > * + * { border-color: var(--border-subtle) !important; }
+
+/* ── Text hardcoded hex ── */
+.dark .text-\[\#1A1A1A\],
+.dark .text-\[\#1a1a1a\]    { color: var(--text-main) !important; }
+.dark .text-\[\#666666\]    { color: var(--text-muted) !important; }
+.dark .text-\[\#999999\]    { color: #888888 !important; }
+
+/* ── Modals / dropdowns that are appended to body ── */
+.dark [role="dialog"],
+.dark [role="menu"]         { background-color: var(--bg-card) !important; border-color: var(--border-subtle) !important; }
+
+/* ════════════════════════════════════════════════════════
+   COMPONENTS
+════════════════════════════════════════════════════════ */
 @layer components {
-  .glass-card {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+  .btn-primary {
+    background-color: var(--primary);
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 9999px;
+    padding: 0.625rem 1.5rem;
+    transition: background-color 0.15s ease;
   }
-  
-  .premium-shadow {
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
-  }
-
-  .nav-active {
-    @apply bg-black text-white shadow-lg;
-  }
+  .btn-primary:hover { background-color: var(--primary-hover); }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
-}
+/* ════════════════════════════════════════════════════════
+   SCROLLBAR
+════════════════════════════════════════════════════════ */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background-color: var(--border-subtle); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--text-subtle); }

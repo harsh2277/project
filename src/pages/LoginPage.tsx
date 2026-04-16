@@ -13,7 +13,7 @@ const LoginPage: React.FC = () => {
         {/* Left Side - Form */}
         <div className="flex-1 p-8 md:p-16 flex flex-col">
           <div className="flex items-center gap-2 mb-16">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Layout className="text-white w-5 h-5" />
             </div>
             <span className="font-bold text-xl tracking-tight">Sellora</span>
@@ -50,15 +50,15 @@ const LoginPage: React.FC = () => {
 
               <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-blue-500" />
                   <span className="text-slate-600">Remember Me</span>
                 </label>
-                <a href="#" className="text-blue-600 font-medium hover:underline">Forgot Your Password?</a>
+                <a href="#" className="text-primary font-medium hover:underline">Forgot Your Password?</a>
               </div>
 
               <button 
                 type="submit"
-                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-lg shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2"
+                className="w-full py-4 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-lg shadow-lg shadow-primary-light transition-all flex items-center justify-center gap-2"
                 onClick={() => window.location.href = '/dashboard'}
               >
                 Log In
@@ -85,7 +85,7 @@ const LoginPage: React.FC = () => {
             </div>
 
             <p className="mt-10 text-center text-slate-500">
-              Don't Have An Account? <a href="#" className="text-blue-600 font-semibold hover:underline">Register Now.</a>
+              Don't Have An Account? <a href="#" className="text-primary font-semibold hover:underline">Register Now.</a>
             </p>
           </div>
 
@@ -98,7 +98,7 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* Right Side - Visual */}
-        <div className="hidden md:flex flex-1 bg-blue-600 p-16 flex-col justify-center relative overflow-hidden">
+        <div className="hidden md:flex flex-1 bg-primary p-16 flex-col justify-center relative overflow-hidden">
           {/* Mockup Elements */}
           <div className="relative z-10">
             <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
@@ -123,7 +123,7 @@ const LoginPage: React.FC = () => {
           </div>
 
           {/* Abstract circles */}
-          <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500 rounded-full opacity-20 blur-3xl"></div>
+          <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-primary rounded-full opacity-20 blur-3xl"></div>
           <div className="absolute -top-20 -left-20 w-80 h-80 bg-blue-400 rounded-full opacity-10 blur-3xl"></div>
         </div>
       </motion.div>

@@ -129,7 +129,7 @@ const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
       >
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#F5F5F5]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[12px] bg-violet-600 flex items-center justify-center text-white">
+            <div className="w-9 h-9 rounded-[12px] bg-primary flex items-center justify-center text-white">
               <CalendarIcon size={17} />
             </div>
             <div>
@@ -210,7 +210,7 @@ const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
           <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#666666] border border-[#EEEEEE] bg-white hover:bg-[#F5F5F5] transition-colors">Cancel</button>
           <button
             onClick={() => onAdd(form)}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-colors shadow-sm"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
           >
             <Check size={16} /> Create Event
           </button>
@@ -241,7 +241,7 @@ const AddDailyTaskModal = ({ onClose, onAdd, selectedDate, monthName }: any) => 
       >
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#F5F5F5]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[12px] bg-blue-600 flex items-center justify-center text-white">
+            <div className="w-9 h-9 rounded-[12px] bg-primary flex items-center justify-center text-white">
               <Plus size={17} />
             </div>
             <div>
@@ -286,7 +286,7 @@ const AddDailyTaskModal = ({ onClose, onAdd, selectedDate, monthName }: any) => 
           <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#666666] border border-[#EEEEEE] bg-white hover:bg-[#F5F5F5] transition-colors">Cancel</button>
           <button
             onClick={() => onAdd({ title, priority })}
-            className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-full text-[14px] font-semibold hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm shadow-primary-light"
           >
             <Plus size={16} /> Add Task
           </button>
@@ -317,7 +317,7 @@ const EditEventModal = ({ event, onClose, onSave, selectedDate, monthName }: any
       >
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#F5F5F5]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[12px] bg-[#1A1A1A] flex items-center justify-center text-white">
+            <div className="w-9 h-9 rounded-[12px] bg-primary flex items-center justify-center text-white">
               <Edit2 size={17} />
             </div>
             <div>
@@ -398,7 +398,7 @@ const EditEventModal = ({ event, onClose, onSave, selectedDate, monthName }: any
           <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#666666] border border-[#EEEEEE] bg-white hover:bg-[#F5F5F5] transition-colors">Cancel</button>
           <button
             onClick={() => onSave(form)}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-colors shadow-sm"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
           >
             <Check size={16} /> Save Changes
           </button>
@@ -464,7 +464,7 @@ interface Event {
 
 const MOCK_EVENTS: Record<number, Event[]> = {
   8: [
-    { id: 1, title: 'Design Review', time: '10:00 AM', type: 'meeting', color: 'bg-violet-500', description: 'Weekly sync with the design team' },
+    { id: 1, title: 'Design Review', time: '10:00 AM', type: 'meeting', color: 'bg-primary', description: 'Weekly sync with the design team' },
   ],
   12: [
     { id: 2, title: 'Client Call', time: '02:00 PM', type: 'meeting', color: 'bg-emerald-500', description: 'Project update with Sellora team' },
@@ -474,10 +474,10 @@ const MOCK_EVENTS: Record<number, Event[]> = {
     { id: 4, title: 'Project Deadline', time: '11:59 PM', type: 'deadline', color: 'bg-rose-500', description: 'Submit final assets' },
   ],
   20: [
-    { id: 5, title: 'Product Demo', time: '01:00 PM', type: 'meeting', color: 'bg-blue-500', description: 'Showcase new prototype' },
+    { id: 5, title: 'Product Demo', time: '01:00 PM', type: 'meeting', color: 'bg-primary', description: 'Showcase new prototype' },
   ],
   24: [
-    { id: 6, title: 'Sprint Planning', time: '09:00 AM', type: 'meeting', color: 'bg-indigo-500', description: 'Q2 Sprint roadmap planning' },
+    { id: 6, title: 'Sprint Planning', time: '09:00 AM', type: 'meeting', color: 'bg-primary', description: 'Q2 Sprint roadmap planning' },
   ]
 };
 
@@ -594,13 +594,13 @@ const CalendarPage: React.FC = () => {
                     >
                       <div className="flex justify-between items-start mb-1">
                         <span className={`text-sm font-bold flex items-center justify-center w-8 h-8 rounded-full transition-all ${!d.current ? 'text-slate-300' :
-                          isToday ? 'bg-blue-600 text-white shadow-md' :
+                          isToday ? 'bg-primary text-white shadow-md' :
                             isSelected ? 'bg-slate-800 text-white' : 'text-slate-700 group-hover:bg-slate-100'
                           }`}>
                           {d.day}
                         </span>
                         {events.length > 0 && (
-                          <div className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></div>
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
                         )}
                       </div>
 
@@ -661,7 +661,7 @@ const CalendarPage: React.FC = () => {
                             <MoreVertical size={16} />
                           </button>
                         </div>
-                        <h4 className="font-bold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">{event.title}</h4>
+                        <h4 className="font-bold text-slate-800 mb-1 group-hover:text-primary transition-colors">{event.title}</h4>
                         <p className="text-xs font-medium text-slate-500 mb-4 leading-relaxed">{event.description}</p>
 
                         <div className="flex items-center gap-3">
@@ -687,7 +687,7 @@ const CalendarPage: React.FC = () => {
                         <CalendarIcon size={32} />
                       </div>
                       <p className="text-sm font-bold text-slate-400">No events scheduled for this day</p>
-                      <button onClick={() => setShowAddEvent(true)} className="mt-4 text-xs font-bold text-blue-600 hover:underline">Add an event</button>
+                      <button onClick={() => setShowAddEvent(true)} className="mt-4 text-xs font-bold text-primary hover:underline">Add an event</button>
                     </motion.div>
                   )}
                 </AnimatePresence>

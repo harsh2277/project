@@ -134,7 +134,7 @@ const TaskDrawer = ({
               <span className="text-[12px] font-bold text-[#1A1A1A]">{progress}%</span>
             </div>
             <div className="w-full h-2 bg-[#EEEEEE] rounded-full overflow-hidden">
-              <div className="h-full bg-[#1A1A1A] rounded-full" style={{ width: `${progress}%` }} />
+              <div className="h-full bg-primary rounded-full" style={{ width: `${progress}%` }} />
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ const TaskDrawer = ({
         <div className="shrink-0 border-t border-[#F5F5F5] p-4 flex items-center gap-3">
           <button
             onClick={() => navigate(`/projects/${task.projectId}`)}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-[13px] font-semibold bg-[#1A1A1A] text-white hover:bg-black transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-[13px] font-semibold bg-primary text-white hover:bg-primary-hover transition-colors"
           >
             <ExternalLink size={14} /> Open Project
           </button>
@@ -238,7 +238,7 @@ const EditTaskModal = ({
           <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#666666] border border-[#EEEEEE] bg-white hover:bg-[#F5F5F5] transition-colors">Cancel</button>
           <button
             onClick={() => { onSave(form); onClose(); }}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-colors shadow-sm"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
           >
             <Check size={16} /> Save Changes
           </button>
@@ -299,7 +299,7 @@ const AddTaskModal = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#F5F5F5]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[12px] bg-[#1A1A1A] flex items-center justify-center text-white">
+            <div className="w-9 h-9 rounded-[12px] bg-primary flex items-center justify-center text-white">
               <Plus size={17} />
             </div>
             <div>
@@ -390,7 +390,7 @@ const AddTaskModal = ({
           <button
             onClick={handleAdd}
             disabled={!form.title.trim()}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus size={16} /> Create Task
           </button>
@@ -401,8 +401,14 @@ const AddTaskModal = ({
   );
 };
 
+const MOCK_JIRA_TASKS: Task[] = [
+  { id: 101, title: '[Jira] Setup CI/CD Pipeline', project: 'Jira - API Migration', projectId: 'jira-1', tag: 'Dev', status: 'In Progress', priority: 'High', due: 'Feb 15, 2026', comments: 12, description: 'Configure GitHub Actions for automated deployment to staging.' },
+  { id: 102, title: '[Jira] Update SSL Certificates', project: 'Jira - Security Patching', projectId: 'jira-2', tag: 'QA', status: 'To Do', priority: 'High', due: 'Feb 12, 2026', comments: 4, description: 'Renew certificates for the main gateway and auth servers.' },
+];
+
 /* ─── Main Component ─────────────────────────────────────────── */
 const Tasks = () => {
+  const [jiraConnected, setJiraConnected] = useState(localStorage.getItem('jira_connected') === 'true');
   const [tasks, setTasks]           = useState<Task[]>(ALL_TASKS);
   const [search, setSearch]         = useState('');
   const [statusFilter, setStatus]   = useState('All');
@@ -415,17 +421,25 @@ const Tasks = () => {
   const [showAddTask, setShowAddTask] = useState(false);
 
   useEffect(() => {
+    const handleStorage = () => setJiraConnected(localStorage.getItem('jira_connected') === 'true');
+    window.addEventListener('storage', handleStorage);
+
     const handler = () => setShowAddTask(true);
     window.addEventListener('openAddTask', handler);
-    return () => window.removeEventListener('openAddTask', handler);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('openAddTask', handler);
+    };
   }, []);
 
-  const total      = tasks.length;
-  const completed  = tasks.filter(t => t.status === 'Completed').length;
-  const inProgress = tasks.filter(t => t.status === 'In Progress').length;
-  const todo       = tasks.filter(t => t.status === 'To Do').length;
+  const totalTasks = jiraConnected ? [...tasks, ...MOCK_JIRA_TASKS] : tasks;
 
-  const filtered = tasks
+  const total      = totalTasks.length;
+  const completed  = totalTasks.filter(t => t.status === 'Completed').length;
+  const inProgress = totalTasks.filter(t => t.status === 'In Progress').length;
+  const todo       = totalTasks.filter(t => t.status === 'To Do').length;
+
+  const filtered = totalTasks
     .filter(t => {
       const matchSearch = t.title.toLowerCase().includes(search.toLowerCase()) ||
                           t.project.toLowerCase().includes(search.toLowerCase());
@@ -470,7 +484,7 @@ const Tasks = () => {
           </div>
           <button
             onClick={() => setShowAddTask(true)}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-colors shadow-sm"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
           >
             <Plus size={18} /> Add Task
           </button>
@@ -493,7 +507,7 @@ const Tasks = () => {
                 </span>
               </div>
               <div className="w-full h-1 bg-[#F5F5F5] rounded-full mt-2">
-                <div className="h-full bg-[#1A1A1A] rounded-full" style={{ width: total > 0 ? `${(k.value / total) * 100}%` : '0%' }} />
+                <div className="h-full bg-primary rounded-full" style={{ width: total > 0 ? `${(k.value / total) * 100}%` : '0%' }} />
               </div>
             </div>
           ))}
@@ -598,7 +612,7 @@ const Tasks = () => {
             <span className="text-[12px] font-semibold text-[#999999]">Showing {filtered.length} of {total} tasks</span>
             <div className="flex items-center gap-2">
               <button className="px-4 py-1.5 rounded-full text-[12px] font-semibold text-[#666666] border border-[#EEEEEE] hover:bg-[#F5F5F5] transition-colors">Previous</button>
-              <button className="px-4 py-1.5 rounded-full text-[12px] font-semibold bg-[#1A1A1A] text-white hover:bg-black transition-colors">Next</button>
+              <button className="px-4 py-1.5 rounded-full text-[12px] font-semibold bg-primary text-white hover:bg-primary-hover transition-colors">Next</button>
             </div>
           </div>
         </div>

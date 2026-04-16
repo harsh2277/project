@@ -82,7 +82,7 @@ const CreateProject = () => {
             </button>
             <button
               onClick={() => navigate('/projects')}
-              className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-colors shadow-sm"
+              className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
             >
               <Check size={16} /> Create Project
             </button>
@@ -233,7 +233,7 @@ const CreateProject = () => {
 
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex-1 bg-[#F5F5F5] rounded-full h-[6px]">
-                  <div className="bg-[#1A1A1A] h-full rounded-full" style={{ width: `${progress}%` }} />
+                  <div className="bg-primary h-full rounded-full" style={{ width: `${progress}%` }} />
                 </div>
                 <span className="text-[14px] font-bold text-[#1A1A1A] shrink-0">{progress}%</span>
               </div>

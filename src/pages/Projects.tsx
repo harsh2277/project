@@ -40,7 +40,7 @@ const ProjectCard = ({
     <div className="bg-white p-5 rounded-[20px] border border-[#EEEEEE] flex flex-col hover:shadow-xl transition-all duration-300 group cursor-pointer h-full">
       {/* Header: Title and Status */}
       <div className="flex justify-between items-start mb-0.5">
-        <h3 className="text-[18px] font-bold text-[#1A1A1A] tracking-tight group-hover:text-blue-600 transition-colors">
+        <h3 className="text-[18px] font-bold text-[#1A1A1A] tracking-tight group-hover:text-primary transition-colors">
           {title}
         </h3>
         <span className={`px-3 py-1 rounded-full text-[12px] font-semibold ${getStatusStyle(status)}`}>
@@ -66,7 +66,7 @@ const ProjectCard = ({
       <div className="flex items-center gap-4 mb-4">
         <div className="flex-1 bg-[#F5F5F5] rounded-full h-[6px]">
           <div
-            className="bg-[#1A1A1A] h-full rounded-full transition-all duration-700 ease-out"
+            className="bg-primary h-full rounded-full transition-all duration-700 ease-out"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
@@ -144,7 +144,7 @@ const ProjectTable = ({ projects, navigate }: any) => {
               className="hover:bg-slate-50 transition-colors cursor-pointer group"
             >
               <td className="px-6 py-5">
-                <p className="text-[15px] font-bold text-[#1A1A1A] group-hover:text-blue-600 transition-colors">{project.title}</p>
+                <p className="text-[15px] font-bold text-[#1A1A1A] group-hover:text-primary transition-colors">{project.title}</p>
                 <p className="text-[13px] text-[#999999] mt-0.5 truncate max-w-[200px]">{project.description}</p>
               </td>
               <td className="px-6 py-5">
@@ -156,7 +156,7 @@ const ProjectTable = ({ projects, navigate }: any) => {
                 <div className="flex items-center gap-3">
                   <div className="w-24 bg-[#F5F5F5] rounded-full h-[6px]">
                     <div
-                      className="bg-[#1A1A1A] h-full rounded-full"
+                      className="bg-primary h-full rounded-full"
                       style={{ width: `${project.progress}%` }}
                     ></div>
                   </div>
@@ -180,7 +180,22 @@ const ProjectTable = ({ projects, navigate }: any) => {
   );
 };
 
-const MOCK_PROJECTS = [
+/* ─── Types ──────────────────────────────────────────────────── */
+interface Project {
+  id: string | number;
+  title: string;
+  description: string;
+  status: string;
+  deadline: string;
+  progress: number;
+  tasks: number;
+  activities: number;
+  startDate: string;
+  priority: string;
+  isJira?: boolean; // Optional property
+}
+
+const MOCK_PROJECTS: Project[] = [
   {
     id: 1,
     title: "Figma Design System",
@@ -255,28 +270,73 @@ const MOCK_PROJECTS = [
   }
 ];
 
+const MOCK_JIRA_PROJECTS: Project[] = [
+  {
+    id: 'jira-1',
+    title: "[Jira] API Migration",
+    description: "Cloud migration of legacy endpoints",
+    status: "In Progress",
+    deadline: "Mar 20, 2026",
+    progress: 45,
+    tasks: 124,
+    activities: 540,
+    startDate: "Feb 01, 2026",
+    priority: "High",
+    isJira: true
+  },
+  {
+    id: 'jira-2',
+    title: "[Jira] Security Patching",
+    description: "CVE vulnerability remediation",
+    status: "Planning",
+    deadline: "Feb 28, 2026",
+    progress: 20,
+    tasks: 45,
+    activities: 120,
+    startDate: "Feb 10, 2026",
+    priority: "High",
+    isJira: true
+  }
+];
+
 const Projects = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeStatus, setActiveStatus] = useState('All Status');
+  const [jiraConnected, setJiraConnected] = useState(localStorage.getItem('jira_connected') === 'true');
   const filterRef = useRef<HTMLDivElement>(null);
 
   const statuses = ['All Status', 'In Progress', 'Pending', 'Completed', 'Planning', 'On Hold'];
 
   useEffect(() => {
+    const handleStorage = () => setJiraConnected(localStorage.getItem('jira_connected') === 'true');
+    window.addEventListener('storage', handleStorage);
+    
     const handleClickOutside = (event: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
         setFilterOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
   }, []);
 
-  const filteredProjects = MOCK_PROJECTS.filter(p =>
-    activeStatus === 'All Status' || p.status === activeStatus
-  );
+  const allProjects = jiraConnected ? [...MOCK_PROJECTS, ...MOCK_JIRA_PROJECTS] : MOCK_PROJECTS;
+
+  const [activeSource, setActiveSource] = useState('All Sources');
+  const sources = ['All Sources', 'Local', 'Jira'];
+
+  const filteredProjects = allProjects.filter(p => {
+    const matchesStatus = activeStatus === 'All Status' || p.status === activeStatus;
+    const matchesSource = activeSource === 'All Sources' || 
+                         (activeSource === 'Jira' && p.isJira) || 
+                         (activeSource === 'Local' && !p.isJira);
+    return matchesStatus && matchesSource;
+  });
 
   return (
     <Layout>
@@ -292,20 +352,22 @@ const Projects = () => {
             <div className="flex items-center bg-white border border-[#EEEEEE] rounded-full p-1 shadow-sm">
               <button
                 onClick={() => setViewMode('card')}
-                className={`p-2 rounded-full transition-all ${viewMode === 'card' ? 'bg-[#1A1A1A] text-white' : 'text-[#999999] hover:text-[#1A1A1A]'}`}
+                className={`p-2 rounded-full transition-all ${viewMode === 'card' ? 'text-white' : 'text-[#999999] hover:text-[#1A1A1A]'}`}
+                style={viewMode === 'card' ? { backgroundColor: 'var(--primary)' } : {}}
               >
                 <Grid size={18} />
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`p-2 rounded-full transition-all ${viewMode === 'table' ? 'bg-[#1A1A1A] text-white' : 'text-[#999999] hover:text-[#1A1A1A]'}`}
+                className={`p-2 rounded-full transition-all ${viewMode === 'table' ? 'text-white' : 'text-[#999999] hover:text-[#1A1A1A]'}`}
+                style={viewMode === 'table' ? { backgroundColor: 'var(--primary)' } : {}}
               >
                 <List size={18} />
               </button>
             </div>
 
             {/* Filter Dropdown */}
-            <div className="relative" ref={filterRef}>
+            <div className="relative">
               <button
                 onClick={() => setFilterOpen(!filterOpen)}
                 className={`flex items-center gap-2 px-5 py-2.5 bg-white border border-[#EEEEEE] rounded-full text-[14px] font-semibold text-[#1A1A1A] hover:bg-gray-50 transition-colors ${filterOpen ? 'ring-2 ring-black/5' : ''}`}
@@ -325,7 +387,7 @@ const Projects = () => {
                           setActiveStatus(status);
                           setFilterOpen(false);
                         }}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-[14px] font-medium transition-colors ${activeStatus === status ? 'bg-slate-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50'}`}
+                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-[14px] font-medium transition-colors ${activeStatus === status ? 'bg-slate-50 text-primary' : 'text-slate-600 hover:bg-slate-50'}`}
                       >
                         {status}
                         {activeStatus === status && <Check size={16} />}
@@ -336,9 +398,23 @@ const Projects = () => {
               )}
             </div>
 
+            {/* Source Filter */}
+            <div className="bg-white border border-[#EEEEEE] rounded-full p-1 flex gap-1">
+              {sources.map(s => (
+                <button
+                  key={s}
+                  onClick={() => setActiveSource(s)}
+                  className={`px-4 py-1.5 rounded-full text-[13px] font-bold transition-all ${activeSource === s ? 'bg-primary-light text-primary' : 'text-slate-400 hover:bg-slate-50'}`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
             <button
               onClick={() => navigate('/projects/new')}
-              className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-colors shadow-sm"
+              className="flex items-center gap-2 px-6 py-2.5 text-white rounded-full text-[14px] font-semibold transition-colors shadow-sm"
+              style={{ backgroundColor: 'var(--primary)' }}
             >
               <FolderPlus size={18} />
               New Project
