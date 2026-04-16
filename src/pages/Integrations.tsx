@@ -40,7 +40,7 @@ const INITIAL_APPS = [
     bg: 'bg-primary-light',
     status: 'disconnected',
     category: 'Management',
-    jiraToken: 'ATATT3xFfGF0LzFqgUr1lxvb1Tp5GYnGMqz_T0xgkCkIuAm0EzzxsZrLJ7YAUHD6EEadJTTd9zZt30uqSkLEao00scJ0Gzl3Tbs21r6FdMG9TTtha_ZE68qoPuJIEKSHWw_-t2KpFbLwU0S_PUsq-pdsPWB9-0ObdaoMATxpttEKdTpOje_2S5o=AB30D476'
+    // jiraToken: 'ATATT3xFfGF0LzFqgUr1lxvb1Tp5GYnGMqz_T0xgkCkIuAm0EzzxsZrLJ7YAUHD6EEadJTTd9zZt30uqSkLEao00scJ0Gzl3Tbs21r6FdMG9TTtha_ZE68qoPuJIEKSHWw_-t2KpFbLwU0S_PUsq-pdsPWB9-0ObdaoMATxpttEKdTpOje_2S5o=AB30D476'
   }
 ];
 
@@ -129,7 +129,7 @@ const JiraModal = ({ isOpen, onClose, onSave, app }: any) => {
 
       // Jira API Basic Auth: base64(email:token)
       const auth = btoa(`${data.email.trim()}:${data.token.trim()}`);
-      
+
       // We use a CORS proxy for development to bypass browser restrictions
       // Note: In production, you should use your own backend as a proxy
       const proxyPrefix = "https://cors-anywhere.herokuapp.com/";
@@ -153,7 +153,7 @@ const JiraModal = ({ isOpen, onClose, onSave, app }: any) => {
         setError(errorData.errorMessages?.[0] || `Verification failed (Status: ${response.status})`);
       }
     } catch (err: any) {
-      setError(err.message === 'Failed to fetch' 
+      setError(err.message === 'Failed to fetch'
         ? "CORS Blocked: Please visit https://cors-anywhere.herokuapp.com/corsdemo to enable the temporary proxy access, then try again."
         : `Error: ${err.message}`);
     } finally {
@@ -359,13 +359,13 @@ const IntegrationCard = ({ app, onUpdate }: any) => {
       </motion.div>
 
       <WebhookModal isOpen={showWebhookModal} onClose={() => setShowWebhookModal(false)} app={app} onSave={(url: string) => { onUpdate(app.id, { status: 'connected', webhookUrl: url }); setShowWebhookModal(false); }} />
-      <JiraModal 
-        isOpen={showJiraModal} 
-        onClose={() => setShowJiraModal(false)} 
-        app={app} 
-        onSave={(data: any) => { 
-          onUpdate(app.id, { status: 'connected', ...data }); 
-          setShowJiraModal(false); 
+      <JiraModal
+        isOpen={showJiraModal}
+        onClose={() => setShowJiraModal(false)}
+        app={app}
+        onSave={(data: any) => {
+          onUpdate(app.id, { status: 'connected', ...data });
+          setShowJiraModal(false);
           // Save full credentials for other pages to use
           localStorage.setItem('jira_connected', 'true');
           localStorage.setItem('jira_config', JSON.stringify({
@@ -373,8 +373,8 @@ const IntegrationCard = ({ app, onUpdate }: any) => {
             email: data.email,
             token: data.token
           }));
-          window.dispatchEvent(new Event('storage')); 
-        }} 
+          window.dispatchEvent(new Event('storage'));
+        }}
       />
     </>
   );
