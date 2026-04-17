@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout } from '../components/Layout';
+import { Layout } from '../../components/layout/Layout';
 import {
   Plus, Search, ExternalLink, Check,
   Settings2, Shield, Zap, Globe,

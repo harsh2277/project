@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Layout } from '../components/Layout';
+import { Layout } from '../../components/layout/Layout';
 import {
   Play, Pause, Square, RotateCcw, FolderDot,
   CheckSquare, ChevronDown, Plus, Trash2, MoreHorizontal, X,

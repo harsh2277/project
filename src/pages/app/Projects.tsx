@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Layout } from '../components/Layout';
+import { Layout } from '../../components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
 import {
   FolderPlus, Calendar, Layout as LayoutIcon, BarChart3, Filter, Grid, List, ChevronDown, Check

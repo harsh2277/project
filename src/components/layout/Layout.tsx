@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useTheme } from './ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = false, isCollapsed = false, path, onPlusClick }: any) => {
   const navigate = useNavigate();

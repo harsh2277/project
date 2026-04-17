@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout } from '../components/Layout';
+import { Layout } from '../../components/layout/Layout';
 import {
   User, Bell, Shield, Palette, Sliders,
   Camera, Check, ChevronRight, Moon, Sun,
@@ -10,7 +10,7 @@ import {
   Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '../components/ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const SettingsSection = ({ title, description, children }: any) => (
   <div className="bg-card rounded-[20px] border border-border p-6 mb-6">

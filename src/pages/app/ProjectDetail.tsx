@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Layout } from '../components/Layout';
+import { Layout } from '../../components/layout/Layout';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft, Plus, MoreHorizontal, Calendar, MessageSquare,

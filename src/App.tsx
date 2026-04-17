@@ -1,28 +1,38 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import SignUpPage from './pages/SignUpPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import Dashboard from './pages/Dashboard';
-import Projects from './pages/Projects';
-import CreateProject from './pages/CreateProject';
-import EditProject from './pages/EditProject';
-import ProjectDetail from './pages/ProjectDetail';
-import Tasks from './pages/Tasks';
-import CalendarPage from './pages/Calendar';
-import TimerPage from './pages/Timer';
-import TimesheetPage from './pages/Timesheet';
-import Integrations from './pages/Integrations';
-import Settings from './pages/Settings';
+
+// Auth Pages
+import LoginPage from './pages/auth/LoginPage';
+import SignUpPage from './pages/auth/SignUpPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+
+// App Pages
+import Dashboard from './pages/app/Dashboard';
+import Projects from './pages/app/Projects';
+import CreateProject from './pages/app/CreateProject';
+import EditProject from './pages/app/EditProject';
+import ProjectDetail from './pages/app/ProjectDetail';
+import Tasks from './pages/app/Tasks';
+import CalendarPage from './pages/app/Calendar';
+import TimerPage from './pages/app/Timer';
+import TimesheetPage from './pages/app/Timesheet';
+import Integrations from './pages/app/Integrations';
+import Settings from './pages/app/Settings';
+
 import './App.css';
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Default redirect */}
         <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Auth Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+        {/* App Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/new" element={<CreateProject />} />

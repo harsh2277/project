@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import dashboardImg from '../assets/dashboard-screenshot.png';
+import dashboardImg from '../../assets/dashboard-screenshot.png';
 
 const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
