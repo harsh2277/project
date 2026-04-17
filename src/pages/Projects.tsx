@@ -18,29 +18,29 @@ const ProjectCard = ({
 }: any) => {
   const getStatusStyle = (type: string) => {
     switch (type) {
-      case 'Completed': return 'bg-[#E8F5E9] text-[#2E7D32]';
-      case 'In Progress': return 'bg-[#FFF3E0] text-[#EF6C00]';
-      case 'Pending': return 'bg-[#E1F5FE] text-[#0288D1]';
-      case 'Planning': return 'bg-[#F3E5F5] text-[#7B1FA2]';
-      case 'On Hold': return 'bg-[#E8EAF6] text-[#3F51B5]';
-      default: return 'bg-slate-100 text-slate-600';
+      case 'Completed': return 'bg-emerald-500/10 text-emerald-600';
+      case 'In Progress': return 'bg-amber-500/10 text-amber-600';
+      case 'Pending': return 'bg-blue-500/10 text-blue-600';
+      case 'Planning': return 'bg-primary/10 text-primary';
+      case 'On Hold': return 'bg-page text-text-muted';
+      default: return 'bg-page text-text-muted';
     }
   };
 
   const getPriorityStyle = (p: string) => {
     switch (p) {
-      case 'High': return 'bg-[#FFEBEE] text-[#D32F2F]';
-      case 'Medium': return 'bg-[#E1F5FE] text-[#0288D1]';
-      case 'Low': return 'bg-[#F1F8E9] text-[#689F38]';
-      default: return 'bg-slate-100 text-slate-600';
+      case 'High': return 'bg-rose-500/10 text-rose-600';
+      case 'Medium': return 'bg-blue-500/10 text-blue-600';
+      case 'Low': return 'bg-emerald-500/10 text-emerald-600';
+      default: return 'bg-page text-text-muted';
     }
   };
 
   return (
-    <div className="bg-white p-5 rounded-[20px] border border-[#EEEEEE] flex flex-col hover:shadow-xl transition-all duration-300 group cursor-pointer h-full">
+    <div className="bg-card p-5 rounded-[20px] border border-border flex flex-col hover:shadow-xl transition-all duration-300 group cursor-pointer h-full">
       {/* Header: Title and Status */}
       <div className="flex justify-between items-start mb-0.5">
-        <h3 className="text-[18px] font-bold text-[#1A1A1A] tracking-tight group-hover:text-primary transition-colors">
+        <h3 className="text-[18px] font-bold text-text-main tracking-tight group-hover:text-primary transition-colors">
           {title}
         </h3>
         <span className={`px-3 py-1 rounded-full text-[12px] font-semibold ${getStatusStyle(status)}`}>
@@ -49,48 +49,48 @@ const ProjectCard = ({
       </div>
 
       {/* Description */}
-      <p className="text-[14px] text-[#666666] mb-3">
+      <p className="text-[14px] text-text-muted mb-3 line-clamp-2">
         {description}
       </p>
 
       {/* Deadline */}
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 text-[14px] text-[#666666]">
-          <Calendar size={16} className="text-[#999999]" />
-          <span className="font-medium text-[#1A1A1A]">Deadline:</span>
-          <span>{deadline}</span>
+        <div className="flex items-center gap-2 text-[14px] text-text-muted">
+          <Calendar size={16} />
+          <span className="font-semibold text-text-main">Deadline:</span>
+          <span className="font-medium text-text-muted">{deadline}</span>
         </div>
       </div>
 
       {/* Progress */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="flex-1 bg-[#F5F5F5] rounded-full h-[6px]">
+        <div className="flex-1 bg-page rounded-full h-[6px]">
           <div
             className="bg-primary h-full rounded-full transition-all duration-700 ease-out"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
-        <span className="text-[14px] font-bold text-[#1A1A1A] shrink-0">{progress}%</span>
+        <span className="text-[14px] font-bold text-text-main shrink-0">{progress}%</span>
       </div>
 
       {/* Stats - Left and Right */}
-      <div className="flex items-center justify-between mb-4 border-b border-[#F5F5F5] pb-4">
-        <div className="text-[12px] font-medium text-[#999999]">
+      <div className="flex items-center justify-between mb-4 border-b border-border pb-4">
+        <div className="text-[12px] font-bold text-text-muted">
           {tasks} task
         </div>
-        <div className="text-[12px] font-medium text-[#999999] text-right">
+        <div className="text-[12px] font-bold text-text-muted text-right">
           {activities} activities
         </div>
       </div>
 
       {/* Details Grid */}
-      <div className="grid grid-cols-2 gap-y-3">
+      <div className="grid grid-cols-2 gap-y-3 mt-auto">
         <div>
-          <p className="text-[13px] text-[#999999] mb-0.5">Start Date</p>
-          <p className="text-[15px] font-bold text-[#1A1A1A]">{startDate}</p>
+          <p className="text-[12px] font-bold text-text-muted mb-0.5 uppercase tracking-wider">Start Date</p>
+          <p className="text-[15px] font-bold text-text-main">{startDate}</p>
         </div>
         <div className="text-right">
-          <p className="text-[13px] text-[#999999] mb-0.5">Priority</p>
+          <p className="text-[12px] font-bold text-text-muted mb-0.5 uppercase tracking-wider">Priority</p>
           <div className="flex justify-end">
             <span className={`px-4 py-1.5 rounded-full text-[13px] font-bold ${getPriorityStyle(priority)}`}>
               {priority}
@@ -105,47 +105,47 @@ const ProjectCard = ({
 const ProjectTable = ({ projects, navigate }: any) => {
   const getStatusStyle = (type: string) => {
     switch (type) {
-      case 'Completed': return 'bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]';
-      case 'In Progress': return 'bg-[#FFF3E0] text-[#EF6C00] border-[#FFE0B2]';
-      case 'Pending': return 'bg-[#E1F5FE] text-[#0288D1] border-[#B3E5FC]';
-      case 'Planning': return 'bg-[#F3E5F5] text-[#7B1FA2] border-[#E1BEE7]';
-      case 'On Hold': return 'bg-[#E8EAF6] text-[#3F51B5] border-[#C5CAE9]';
-      default: return 'bg-slate-100 text-slate-600 border-slate-200';
+      case 'Completed': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
+      case 'In Progress': return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
+      case 'Pending': return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
+      case 'Planning': return 'bg-primary/10 text-primary border-primary/20';
+      case 'On Hold': return 'bg-page text-text-muted border-border';
+      default: return 'bg-page text-text-muted border-border';
     }
   };
 
   const getPriorityStyle = (p: string) => {
     switch (p) {
-      case 'High': return 'text-[#D32F2F]';
-      case 'Medium': return 'text-[#0288D1]';
-      case 'Low': return 'text-[#689F38]';
-      default: return 'text-slate-600';
+      case 'High': return 'text-rose-600';
+      case 'Medium': return 'text-blue-600';
+      case 'Low': return 'text-emerald-600';
+      default: return 'text-text-muted';
     }
   };
 
   return (
-    <div className="bg-white rounded-[20px] border border-[#EEEEEE] overflow-hidden">
+    <div className="bg-card rounded-[20px] border border-border overflow-hidden shadow-sm">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-slate-50 border-b border-[#EEEEEE]">
-            <th className="px-6 py-4 text-[13px] font-bold text-[#999999] uppercase tracking-wider">Project Name</th>
-            <th className="px-6 py-4 text-[13px] font-bold text-[#999999] uppercase tracking-wider">Status</th>
-            <th className="px-6 py-4 text-[13px] font-bold text-[#999999] uppercase tracking-wider">Progress</th>
-            <th className="px-6 py-4 text-[13px] font-bold text-[#999999] uppercase tracking-wider">Deadline</th>
-            <th className="px-6 py-4 text-[13px] font-bold text-[#999999] uppercase tracking-wider">Priority</th>
-            <th className="px-6 py-4 text-[13px] font-bold text-[#999999] uppercase tracking-wider">Start Date</th>
+          <tr className="bg-page border-b border-border">
+            <th className="px-6 py-4 text-[13px] font-bold text-text-muted uppercase tracking-wider">Project Name</th>
+            <th className="px-6 py-4 text-[13px] font-bold text-text-muted uppercase tracking-wider">Status</th>
+            <th className="px-6 py-4 text-[13px] font-bold text-text-muted uppercase tracking-wider">Progress</th>
+            <th className="px-6 py-4 text-[13px] font-bold text-text-muted uppercase tracking-wider">Deadline</th>
+            <th className="px-6 py-4 text-[13px] font-bold text-text-muted uppercase tracking-wider">Priority</th>
+            <th className="px-6 py-4 text-[13px] font-bold text-text-muted uppercase tracking-wider">Start Date</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#EEEEEE]">
+        <tbody className="divide-y divide-border">
           {projects.map((project: any) => (
             <tr
               key={project.id}
               onClick={() => navigate(`/projects/${project.id}`)}
-              className="hover:bg-slate-50 transition-colors cursor-pointer group"
+              className="hover:bg-page transition-colors cursor-pointer group"
             >
               <td className="px-6 py-5">
-                <p className="text-[15px] font-bold text-[#1A1A1A] group-hover:text-primary transition-colors">{project.title}</p>
-                <p className="text-[13px] text-[#999999] mt-0.5 truncate max-w-[200px]">{project.description}</p>
+                <p className="text-[15px] font-bold text-text-main group-hover:text-primary transition-colors">{project.title}</p>
+                <p className="text-[13px] text-text-muted mt-0.5 truncate max-w-[200px]">{project.description}</p>
               </td>
               <td className="px-6 py-5">
                 <span className={`px-3 py-1 rounded-full text-[12px] font-semibold border ${getStatusStyle(project.status)}`}>
@@ -154,23 +154,23 @@ const ProjectTable = ({ projects, navigate }: any) => {
               </td>
               <td className="px-6 py-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-24 bg-[#F5F5F5] rounded-full h-[6px]">
+                  <div className="w-24 bg-page rounded-full h-[6px]">
                     <div
                       className="bg-primary h-full rounded-full"
                       style={{ width: `${project.progress}%` }}
                     ></div>
                   </div>
-                  <span className="text-[13px] font-bold text-[#1A1A1A]">{project.progress}%</span>
+                  <span className="text-[13px] font-bold text-text-main">{project.progress}%</span>
                 </div>
               </td>
               <td className="px-6 py-5">
-                <p className="text-[14px] text-[#1A1A1A] font-medium">{project.deadline}</p>
+                <p className="text-[14px] text-text-main font-medium">{project.deadline}</p>
               </td>
               <td className="px-6 py-5">
                 <p className={`text-[14px] font-bold ${getPriorityStyle(project.priority)}`}>{project.priority}</p>
               </td>
               <td className="px-6 py-5">
-                <p className="text-[14px] text-[#1A1A1A] font-medium">{project.startDate}</p>
+                <p className="text-[14px] text-text-main font-medium">{project.startDate}</p>
               </td>
             </tr>
           ))}
@@ -344,22 +344,22 @@ const Projects = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-[20px] font-bold text-[#1A1A1A]">Total {filteredProjects.length} projects</h1>
+            <h1 className="text-[20px] font-bold text-text-main">Total {filteredProjects.length} projects</h1>
           </div>
 
           <div className="flex items-center gap-4">
             {/* View Toggle */}
-            <div className="flex items-center bg-white border border-[#EEEEEE] rounded-full p-1 shadow-sm">
+            <div className="flex items-center bg-card border border-border rounded-full p-1 shadow-sm">
               <button
                 onClick={() => setViewMode('card')}
-                className={`p-2 rounded-full transition-all ${viewMode === 'card' ? 'text-white' : 'text-[#999999] hover:text-[#1A1A1A]'}`}
+                className={`p-2 rounded-full transition-all ${viewMode === 'card' ? 'text-white' : 'text-text-muted hover:text-text-main'}`}
                 style={viewMode === 'card' ? { backgroundColor: 'var(--primary)' } : {}}
               >
                 <Grid size={18} />
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`p-2 rounded-full transition-all ${viewMode === 'table' ? 'text-white' : 'text-[#999999] hover:text-[#1A1A1A]'}`}
+                className={`p-2 rounded-full transition-all ${viewMode === 'table' ? 'text-white' : 'text-text-muted hover:text-text-main'}`}
                 style={viewMode === 'table' ? { backgroundColor: 'var(--primary)' } : {}}
               >
                 <List size={18} />
@@ -370,7 +370,7 @@ const Projects = () => {
             <div className="relative">
               <button
                 onClick={() => setFilterOpen(!filterOpen)}
-                className={`flex items-center gap-2 px-5 py-2.5 bg-white border border-[#EEEEEE] rounded-full text-[14px] font-semibold text-[#1A1A1A] hover:bg-gray-50 transition-colors ${filterOpen ? 'ring-2 ring-black/5' : ''}`}
+                className={`flex items-center gap-2 px-5 py-2.5 bg-card border border-border rounded-full text-[14px] font-semibold text-text-main hover:bg-page transition-colors ${filterOpen ? 'ring-2 ring-primary/10' : ''}`}
               >
                 <Filter size={18} />
                 {activeStatus}
@@ -378,7 +378,7 @@ const Projects = () => {
               </button>
 
               {filterOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-[#EEEEEE] rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in duration-200">
                   <div className="p-2">
                     {statuses.map(status => (
                       <button
@@ -387,7 +387,7 @@ const Projects = () => {
                           setActiveStatus(status);
                           setFilterOpen(false);
                         }}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-[14px] font-medium transition-colors ${activeStatus === status ? 'bg-slate-50 text-primary' : 'text-slate-600 hover:bg-slate-50'}`}
+                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-[14px] font-bold transition-colors ${activeStatus === status ? 'bg-primary/10 text-primary' : 'text-text-muted hover:bg-page hover:text-text-main'}`}
                       >
                         {status}
                         {activeStatus === status && <Check size={16} />}
@@ -399,12 +399,12 @@ const Projects = () => {
             </div>
 
             {/* Source Filter */}
-            <div className="bg-white border border-[#EEEEEE] rounded-full p-1 flex gap-1">
+            <div className="bg-card border border-border rounded-full p-1 flex gap-1">
               {sources.map(s => (
                 <button
                   key={s}
                   onClick={() => setActiveSource(s)}
-                  className={`px-4 py-1.5 rounded-full text-[13px] font-bold transition-all ${activeSource === s ? 'bg-primary-light text-primary' : 'text-slate-400 hover:bg-slate-50'}`}
+                  className={`px-4 py-1.5 rounded-full text-[13px] font-bold transition-all ${activeSource === s ? 'bg-primary text-white' : 'text-text-muted hover:text-text-main'}`}
                 >
                   {s}
                 </button>

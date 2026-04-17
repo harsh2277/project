@@ -5,8 +5,6 @@ import {
   ChevronRight,
   Calendar as CalendarIcon,
   Plus,
-  Search,
-  Filter,
   MoreVertical,
   Clock,
   MapPin,
@@ -29,20 +27,20 @@ const EventDrawer = ({ event, onClose, onDelete, onEdit, monthName, selectedDate
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="fixed top-0 right-0 h-full w-full max-w-[420px] bg-white z-50 flex flex-col shadow-2xl"
+        className="fixed top-0 right-0 h-full w-full max-w-[420px] bg-card z-50 flex flex-col shadow-2xl"
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-6 border-b border-[#F5F5F5] shrink-0">
+        <div className="flex items-start justify-between p-6 border-b border-border shrink-0">
           <div className="flex-1 pr-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className={`w-2.5 h-2.5 rounded-full ${event.color}`} />
-              <span className={`text-[13px] font-bold uppercase tracking-wider ${event.color.replace('bg-', 'text-')}`}>
+              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: EVENT_COLORS[event.color]?.pill || EVENT_COLORS.primary.pill }} />
+              <span className="text-[13px] font-bold uppercase tracking-wider" style={{ color: EVENT_COLORS[event.color]?.text || EVENT_COLORS.primary.text }}>
                 {event.type}
               </span>
             </div>
-            <h2 className="text-[19px] font-bold text-[#1A1A1A] leading-tight">{event.title}</h2>
+            <h2 className="text-[19px] font-bold text-text-main leading-tight">{event.title}</h2>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full text-[#999999] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-all">
+          <button onClick={onClose} className="p-2 rounded-full text-text-muted hover:text-text-main hover:bg-page transition-all">
             <X size={20} />
           </button>
         </div>
@@ -51,25 +49,25 @@ const EventDrawer = ({ event, onClose, onDelete, onEdit, monthName, selectedDate
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: <CalendarIcon size={13} className="text-[#999999]" />, label: 'Date', value: `${monthName} ${selectedDate}, 2026` },
-              { icon: <Clock size={13} className="text-[#999999]" />, label: 'Time', value: event.time },
-              { icon: <MapPin size={13} className="text-[#999999]" />, label: 'Location', value: event.location || 'Not specified' },
-              { icon: <Users size={13} className="text-[#999999]" />, label: 'Team', value: '4 Members' },
+              { icon: <CalendarIcon size={13} className="text-text-muted" />, label: 'Date', value: `${monthName} ${selectedDate}, 2026` },
+              { icon: <Clock size={13} className="text-text-muted" />, label: 'Time', value: event.time },
+              { icon: <MapPin size={13} className="text-text-muted" />, label: 'Location', value: event.location || 'Not specified' },
+              { icon: <Users size={13} className="text-text-muted" />, label: 'Team', value: '4 Members' },
             ].map(row => (
-              <div key={row.label} className="bg-[#F8F8F8] rounded-[18px] p-4">
+              <div key={row.label} className="bg-page rounded-[18px] p-4">
                 <div className="flex items-center gap-2 mb-2">
                   {row.icon}
-                  <span className="text-[11px] font-bold text-[#999999] uppercase tracking-wide">{row.label}</span>
+                  <span className="text-[11px] font-bold text-text-muted uppercase tracking-wide">{row.label}</span>
                 </div>
-                <div className="text-[13px] font-bold text-[#1A1A1A]">{row.value}</div>
+                <div className="text-[13px] font-bold text-text-main">{row.value}</div>
               </div>
             ))}
           </div>
 
           <div>
-            <p className="text-[12px] font-bold text-[#999999] uppercase tracking-wider mb-2 ml-1">Description</p>
-            <div className="bg-[#F8F8F8] rounded-[20px] p-5">
-              <p className="text-[14px] font-medium text-[#444444] leading-relaxed">
+            <p className="text-[12px] font-bold text-text-muted uppercase tracking-wider mb-2 ml-1">Description</p>
+            <div className="bg-page rounded-[20px] p-5">
+              <p className="text-[14px] font-medium text-text-main leading-relaxed">
                 {event.description || 'No detailed description provided for this event.'}
               </p>
             </div>
@@ -79,16 +77,16 @@ const EventDrawer = ({ event, onClose, onDelete, onEdit, monthName, selectedDate
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-[#F5F5F5] p-5 flex items-center gap-3">
+        <div className="shrink-0 border-t border-border p-5 flex items-center gap-3">
           <button
             onClick={onEdit}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-[14px] font-bold text-[#1A1A1A] border border-[#EEEEEE] hover:bg-[#F5F5F5] transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-[14px] font-bold text-text-main border border-border hover:bg-page transition-colors"
           >
             <Edit2 size={16} /> Edit Details
           </button>
           <button
             onClick={onDelete}
-            className="p-3 rounded-full text-[#D32F2F] border border-[#FFCDD2] hover:bg-[#FFEBEE] transition-colors"
+            className="p-3 rounded-full text-rose-600 border border-rose-500/20 hover:bg-rose-500/10 transition-colors"
           >
             <Trash2 size={18} />
           </button>
@@ -98,7 +96,7 @@ const EventDrawer = ({ event, onClose, onDelete, onEdit, monthName, selectedDate
   );
 };
 
-const modalInputCls = "w-full px-4 py-3 bg-[#F5F5F5] border border-transparent rounded-[14px] focus:bg-white focus:border-[#1A1A1A] focus:ring-2 focus:ring-black/5 transition-all text-[14px] font-medium text-[#1A1A1A] placeholder:text-[#999999] outline-none";
+const modalInputCls = "w-full px-4 py-3 bg-page border border-transparent rounded-[14px] focus:bg-card focus:border-primary transition-all text-[14px] font-medium text-text-main placeholder:text-text-muted outline-none dark:bg-zinc-900";
 const modalSelectCls = modalInputCls + " appearance-none cursor-pointer";
 
 const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
@@ -125,24 +123,24 @@ const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
         initial={{ scale: 0.94, y: 8, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.94, y: 8, opacity: 0 }}
-        className="relative bg-white rounded-[24px] border border-[#EEEEEE] shadow-2xl w-full max-w-lg overflow-hidden"
+        className="relative bg-card rounded-[24px] border border-border shadow-2xl w-full max-w-lg overflow-hidden"
       >
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#F5F5F5]">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-[12px] bg-primary flex items-center justify-center text-white">
               <CalendarIcon size={17} />
             </div>
             <div>
-              <h2 className="text-[16px] font-bold text-[#1A1A1A]">Add New Event</h2>
-              <p className="text-[12px] font-medium text-[#999999]">Scheduling for {monthName} {selectedDate}</p>
+              <h2 className="text-[16px] font-bold text-text-main">Add New Event</h2>
+              <p className="text-[12px] font-medium text-text-muted">Scheduling for {monthName} {selectedDate}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full text-[#999999] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-all"><X size={18} /></button>
+          <button onClick={onClose} className="p-2 rounded-full text-text-muted hover:text-text-main hover:bg-page transition-all"><X size={18} /></button>
         </div>
 
         <div className="px-6 py-5 space-y-4">
           <div>
-            <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Event Title <span className="text-rose-500">*</span></label>
+            <label className="block text-[13px] font-bold text-text-main mb-2">Event Title <span className="text-rose-500">*</span></label>
             <input
               autoFocus
               className={modalInputCls}
@@ -154,7 +152,7 @@ const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Time</label>
+              <label className="block text-[13px] font-bold text-text-main mb-2">Time</label>
               <div className="relative">
                 <input
                   type="time"
@@ -165,7 +163,7 @@ const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
               </div>
             </div>
             <div>
-              <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Event Type</label>
+              <label className="block text-[13px] font-bold text-text-main mb-2">Event Type</label>
               <div className="relative">
                 <select
                   className={modalSelectCls}
@@ -176,15 +174,15 @@ const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
                   <option value="task">Task</option>
                   <option value="deadline">Deadline</option>
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999999] pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Location / Link</label>
+            <label className="block text-[13px] font-bold text-text-main mb-2">Location / Link</label>
             <div className="relative">
-              <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
                 className={modalInputCls + " pl-11"}
                 placeholder="Google Meet or Office Room"
@@ -195,7 +193,7 @@ const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
           </div>
 
           <div>
-            <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Description</label>
+            <label className="block text-[13px] font-bold text-text-main mb-2">Description</label>
             <textarea
               rows={3}
               className={modalInputCls + ' resize-none'}
@@ -207,7 +205,7 @@ const AddEventModal = ({ onClose, onAdd, selectedDate, monthName }: any) => {
         </div>
 
         <div className="flex items-center justify-between px-6 pb-6 pt-2">
-          <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#666666] border border-[#EEEEEE] bg-white hover:bg-[#F5F5F5] transition-colors">Cancel</button>
+          <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-text-muted border border-border bg-card hover:bg-page transition-colors">Cancel</button>
           <button
             onClick={() => onAdd(form)}
             className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
@@ -237,24 +235,24 @@ const AddDailyTaskModal = ({ onClose, onAdd, selectedDate, monthName }: any) => 
         initial={{ scale: 0.94, y: 8, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.94, y: 8, opacity: 0 }}
-        className="relative bg-white rounded-[24px] border border-[#EEEEEE] shadow-2xl w-full max-w-md overflow-hidden"
+        className="relative bg-card rounded-[24px] border border-border shadow-2xl w-full max-w-md overflow-hidden"
       >
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#F5F5F5]">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-[12px] bg-primary flex items-center justify-center text-white">
               <Plus size={17} />
             </div>
             <div>
-              <h2 className="text-[16px] font-bold text-[#1A1A1A]">Add Daily Task</h2>
-              <p className="text-[12px] font-medium text-[#999999]">Scheduled for {monthName} {selectedDate}</p>
+              <h2 className="text-[16px] font-bold text-text-main">Add Daily Task</h2>
+              <p className="text-[12px] font-medium text-text-muted">Scheduled for {monthName} {selectedDate}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full text-[#999999] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-all"><X size={18} /></button>
+          <button onClick={onClose} className="p-2 rounded-full text-text-muted hover:text-text-main hover:bg-page transition-all"><X size={18} /></button>
         </div>
 
         <div className="px-6 py-5 space-y-4">
           <div>
-            <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Task Title</label>
+            <label className="block text-[13px] font-bold text-text-main mb-2">Task Title</label>
             <input
               autoFocus
               className={modalInputCls}
@@ -264,15 +262,15 @@ const AddDailyTaskModal = ({ onClose, onAdd, selectedDate, monthName }: any) => 
             />
           </div>
           <div>
-            <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Priority</label>
+            <label className="block text-[13px] font-bold text-text-main mb-2">Priority</label>
             <div className="flex gap-2">
               {['Low', 'Medium', 'High'].map(p => (
                 <button
                   key={p}
                   onClick={() => setPriority(p)}
                   className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all border ${priority === p
-                    ? 'bg-slate-900 text-white border-transparent shadow-md'
-                    : 'bg-slate-50 text-slate-500 border-slate-100 hover:bg-slate-100'
+                    ? 'bg-primary text-white border-transparent shadow-md'
+                    : 'bg-page text-text-muted border-border hover:bg-card'
                     }`}
                 >
                   {p}
@@ -283,10 +281,10 @@ const AddDailyTaskModal = ({ onClose, onAdd, selectedDate, monthName }: any) => 
         </div>
 
         <div className="flex items-center justify-between px-6 pb-6 pt-2">
-          <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#666666] border border-[#EEEEEE] bg-white hover:bg-[#F5F5F5] transition-colors">Cancel</button>
+          <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-text-muted border border-border bg-card hover:bg-page transition-colors">Cancel</button>
           <button
             onClick={() => onAdd({ title, priority })}
-            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm shadow-primary-light"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
           >
             <Plus size={16} /> Add Task
           </button>
@@ -313,24 +311,24 @@ const EditEventModal = ({ event, onClose, onSave, selectedDate, monthName }: any
         initial={{ scale: 0.94, y: 8, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.94, y: 8, opacity: 0 }}
-        className="relative bg-white rounded-[24px] border border-[#EEEEEE] shadow-2xl w-full max-w-lg overflow-hidden"
+        className="relative bg-card rounded-[24px] border border-border shadow-2xl w-full max-w-lg overflow-hidden"
       >
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#F5F5F5]">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-[12px] bg-primary flex items-center justify-center text-white">
               <Edit2 size={17} />
             </div>
             <div>
-              <h2 className="text-[16px] font-bold text-[#1A1A1A]">Edit Event</h2>
-              <p className="text-[12px] font-medium text-[#999999]">Updates for {monthName} {selectedDate}</p>
+              <h2 className="text-[16px] font-bold text-text-main">Edit Event</h2>
+              <p className="text-[12px] font-medium text-text-muted">Updates for {monthName} {selectedDate}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full text-[#999999] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-all"><X size={18} /></button>
+          <button onClick={onClose} className="p-2 rounded-full text-text-muted hover:text-text-main hover:bg-page transition-all"><X size={18} /></button>
         </div>
 
         <div className="px-6 py-5 space-y-4">
           <div>
-            <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Event Title <span className="text-rose-500">*</span></label>
+            <label className="block text-[13px] font-bold text-text-main mb-2">Event Title <span className="text-rose-500">*</span></label>
             <input
               autoFocus
               className={modalInputCls}
@@ -342,7 +340,7 @@ const EditEventModal = ({ event, onClose, onSave, selectedDate, monthName }: any
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Time</label>
+              <label className="block text-[13px] font-bold text-text-main mb-2">Time</label>
               <div className="relative">
                 <input
                   type="time"
@@ -353,7 +351,7 @@ const EditEventModal = ({ event, onClose, onSave, selectedDate, monthName }: any
               </div>
             </div>
             <div>
-              <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Event Type</label>
+              <label className="block text-[13px] font-bold text-text-main mb-2">Event Type</label>
               <div className="relative">
                 <select
                   className={modalSelectCls}
@@ -364,15 +362,15 @@ const EditEventModal = ({ event, onClose, onSave, selectedDate, monthName }: any
                   <option value="task">Task</option>
                   <option value="deadline">Deadline</option>
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999999] pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Location / Link</label>
+            <label className="block text-[13px] font-bold text-text-main mb-2">Location / Link</label>
             <div className="relative">
-              <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
                 className={modalInputCls + " pl-11"}
                 placeholder="Google Meet or Office Room"
@@ -383,7 +381,7 @@ const EditEventModal = ({ event, onClose, onSave, selectedDate, monthName }: any
           </div>
 
           <div>
-            <label className="block text-[13px] font-bold text-[#1A1A1A] mb-2">Description</label>
+            <label className="block text-[13px] font-bold text-text-main mb-2">Description</label>
             <textarea
               rows={3}
               className={modalInputCls + ' resize-none'}
@@ -395,7 +393,7 @@ const EditEventModal = ({ event, onClose, onSave, selectedDate, monthName }: any
         </div>
 
         <div className="flex items-center justify-between px-6 pb-6 pt-2">
-          <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-[#666666] border border-[#EEEEEE] bg-white hover:bg-[#F5F5F5] transition-colors">Cancel</button>
+          <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-text-muted border border-border bg-card hover:bg-page transition-colors">Cancel</button>
           <button
             onClick={() => onSave(form)}
             className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
@@ -422,27 +420,27 @@ const DeleteEventModal = ({ event, onClose, onDelete }: any) => {
         initial={{ scale: 0.94, y: 8, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.94, y: 8, opacity: 0 }}
-        className="relative bg-white rounded-[24px] border border-[#EEEEEE] shadow-2xl w-full max-w-sm overflow-hidden p-6"
+        className="relative bg-card rounded-[24px] border border-border shadow-2xl w-full max-w-sm overflow-hidden p-6"
       >
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 mb-4 animate-bounce">
+          <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 mb-4 animate-bounce">
             <AlertTriangle size={32} />
           </div>
-          <h2 className="text-[18px] font-bold text-[#1A1A1A] mb-2">Delete Event?</h2>
-          <p className="text-[14px] font-medium text-[#999999] mb-8">
-            Are you sure you want to delete <span className="text-[#1A1A1A] font-bold">"{event.title}"</span>? This action cannot be undone.
+          <h2 className="text-[18px] font-bold text-text-main mb-2">Delete Event?</h2>
+          <p className="text-[14px] font-medium text-text-muted mb-8">
+            Are you sure you want to delete <span className="text-text-main font-bold">"{event.title}"</span>? This action cannot be undone.
           </p>
 
           <div className="grid grid-cols-2 gap-3 w-full">
             <button
               onClick={onClose}
-              className="py-3 rounded-xl text-[14px] font-bold text-[#666666] bg-slate-50 hover:bg-slate-100 transition-colors"
+              className="py-3 rounded-xl text-[14px] font-bold text-text-muted bg-page hover:bg-card border border-border transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={() => onDelete(event.id)}
-              className="py-3 rounded-xl text-[14px] font-bold text-white bg-rose-500 hover:bg-rose-600 transition-colors shadow-lg shadow-rose-100"
+              className="py-3 rounded-xl text-[14px] font-bold text-white bg-rose-500 hover:bg-rose-600 transition-colors shadow-lg shadow-rose-500/10"
             >
               Delete
             </button>
@@ -462,22 +460,30 @@ interface Event {
   description: string;
 }
 
+const EVENT_COLORS: Record<string, { bg: string; text: string; border: string; pill: string }> = {
+  primary:      { bg: 'rgba(0,59,255,0.12)',  text: '#003bff', border: '#003bff', pill: '#003bff' },
+  emerald:      { bg: 'rgba(16,185,129,0.12)', text: '#059669', border: '#10b981', pill: '#10b981' },
+  amber:        { bg: 'rgba(245,158,11,0.12)', text: '#d97706', border: '#f59e0b', pill: '#f59e0b' },
+  rose:         { bg: 'rgba(239,68,68,0.12)',  text: '#dc2626', border: '#ef4444', pill: '#ef4444' },
+  violet:       { bg: 'rgba(139,92,246,0.12)', text: '#7c3aed', border: '#8b5cf6', pill: '#8b5cf6' },
+};
+
 const MOCK_EVENTS: Record<number, Event[]> = {
   8: [
-    { id: 1, title: 'Design Review', time: '10:00 AM', type: 'meeting', color: 'bg-primary', description: 'Weekly sync with the design team' },
+    { id: 1, title: 'Design Review', time: '10:00 AM', type: 'meeting', color: 'primary', description: 'Weekly sync with the design team' },
   ],
   12: [
-    { id: 2, title: 'Client Call', time: '02:00 PM', type: 'meeting', color: 'bg-emerald-500', description: 'Project update with Sellora team' },
-    { id: 3, title: 'Fix Layout Bug', time: '04:30 PM', type: 'task', color: 'bg-amber-500', description: 'CSS fixes for mobile view' },
+    { id: 2, title: 'Client Call', time: '02:00 PM', type: 'meeting', color: 'emerald', description: 'Project update with Sellora team' },
+    { id: 3, title: 'Fix Layout Bug', time: '04:30 PM', type: 'task', color: 'amber', description: 'CSS fixes for mobile view' },
   ],
   15: [
-    { id: 4, title: 'Project Deadline', time: '11:59 PM', type: 'deadline', color: 'bg-rose-500', description: 'Submit final assets' },
+    { id: 4, title: 'Project Deadline', time: '11:59 PM', type: 'deadline', color: 'rose', description: 'Submit final assets' },
   ],
   20: [
-    { id: 5, title: 'Product Demo', time: '01:00 PM', type: 'meeting', color: 'bg-primary', description: 'Showcase new prototype' },
+    { id: 5, title: 'Product Demo', time: '01:00 PM', type: 'meeting', color: 'primary', description: 'Showcase new prototype' },
   ],
   24: [
-    { id: 6, title: 'Sprint Planning', time: '09:00 AM', type: 'meeting', color: 'bg-primary', description: 'Q2 Sprint roadmap planning' },
+    { id: 6, title: 'Sprint Planning', time: '09:00 AM', type: 'meeting', color: 'primary', description: 'Q2 Sprint roadmap planning' },
   ]
 };
 
@@ -529,25 +535,25 @@ const CalendarPage: React.FC = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Calendar</h1>
-            <p className="text-sm font-medium text-slate-500 mt-0.5">Manage your schedule and upcoming tasks</p>
+            <h1 className="text-2xl font-bold text-text-main tracking-tight">Calendar</h1>
+            <p className="text-sm font-medium text-text-muted mt-0.5">Manage your schedule and upcoming tasks</p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="flex items-center bg-card border border-border rounded-xl overflow-hidden shadow-sm">
               <button
                 onClick={prevMonth}
-                className="p-2.5 hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition-colors"
+                className="p-2.5 hover:bg-page text-text-muted hover:text-text-main transition-colors"
                 title="Previous Month"
               >
                 <ChevronLeft size={20} />
               </button>
-              <div className="px-4 py-2 font-bold text-slate-700 min-w-[140px] text-center border-x border-slate-100">
+              <div className="px-4 py-2 font-bold text-text-main min-w-[140px] text-center border-x border-border">
                 {monthName} {year}
               </div>
               <button
                 onClick={nextMonth}
-                className="p-2.5 hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition-colors"
+                className="p-2.5 hover:bg-page text-text-muted hover:text-text-main transition-colors"
                 title="Next Month"
               >
                 <ChevronRight size={20} />
@@ -556,7 +562,7 @@ const CalendarPage: React.FC = () => {
 
             <button
               onClick={() => setShowAddEvent(true)}
-              className="flex items-center gap-2 px-6 py-2.5 bg-black text-white rounded-xl text-sm font-semibold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
+              className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary-hover transition-all shadow-lg"
             >
               <Plus size={18} />
               New Event
@@ -568,11 +574,11 @@ const CalendarPage: React.FC = () => {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 min-h-[700px]">
           {/* Left Side: Calendar Grid */}
           <div className="xl:col-span-3 flex flex-col gap-4">
-            <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden">
+            <div className="bg-card rounded-[2rem] border border-border shadow-xl overflow-hidden">
               {/* Day Headers */}
-              <div className="grid grid-cols-7 border-b border-slate-50">
+              <div className="grid grid-cols-7 border-b border-border">
                 {dayNames.map(day => (
-                  <div key={day} className="py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  <div key={day} className="py-4 text-center text-xs font-bold text-text-muted/50 uppercase tracking-wider">
                     {day}
                   </div>
                 ))}
@@ -589,13 +595,13 @@ const CalendarPage: React.FC = () => {
                     <div
                       key={index}
                       onClick={() => d.current && setSelectedDate(d.day)}
-                      className={`min-h-[120px] p-2 border-r border-b border-slate-50 transition-all duration-300 cursor-pointer group relative ${!d.current ? 'bg-slate-50/30' : 'bg-white hover:bg-slate-50/50'
+                      className={`min-h-[120px] p-2 border-r border-b border-border transition-all duration-300 cursor-pointer group relative ${!d.current ? 'bg-page/30' : 'bg-card hover:bg-page/50'
                         } ${index % 7 === 6 ? 'border-r-0' : ''}`}
                     >
-                      <div className="flex justify-between items-start mb-1">
-                        <span className={`text-sm font-bold flex items-center justify-center w-8 h-8 rounded-full transition-all ${!d.current ? 'text-slate-300' :
+                      <div className="flex justify-between items-start mb-1 text-text-muted/30">
+                        <span className={`text-sm font-bold flex items-center justify-center w-8 h-8 rounded-full transition-all ${!d.current ? 'text-text-muted/30' :
                           isToday ? 'bg-primary text-white shadow-md' :
-                            isSelected ? 'bg-slate-800 text-white' : 'text-slate-700 group-hover:bg-slate-100'
+                            isSelected ? 'bg-text-main text-card' : 'text-text-main group-hover:bg-page'
                           }`}>
                           {d.day}
                         </span>
@@ -605,19 +611,23 @@ const CalendarPage: React.FC = () => {
                       </div>
 
                       <div className="space-y-1">
-                        {events.slice(0, 2).map(event => (
-                          <motion.div
-                            initial={{ opacity: 0, x: -5 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            key={event.id}
-                            onClick={(e) => { e.stopPropagation(); setActiveEvent(event); }}
-                            className={`${event.color} bg-opacity-10 ${event.color.replace('bg-', 'text-')} px-2 py-1 rounded-lg text-[10px] font-bold truncate border-l-2 ${event.color.replace('bg-', 'border-')} hover:brightness-95 transition-all`}
-                          >
-                            {event.time} {event.title}
-                          </motion.div>
-                        ))}
+                        {events.slice(0, 2).map(event => {
+                          const c = EVENT_COLORS[event.color] || EVENT_COLORS.primary;
+                          return (
+                            <motion.div
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              key={event.id}
+                              onClick={(e) => { e.stopPropagation(); setActiveEvent(event); }}
+                              className="px-2 py-1 rounded-lg text-[10px] font-bold truncate border-l-2 hover:brightness-95 transition-all outline-none cursor-pointer"
+                              style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
+                            >
+                              {event.time} {event.title}
+                            </motion.div>
+                          );
+                        })}
                         {events.length > 2 && (
-                          <div className="text-[10px] font-bold text-slate-400 pl-2">
+                          <div className="text-[10px] font-bold text-text-muted/50 pl-2">
                             +{events.length - 2} more
                           </div>
                         )}
@@ -631,12 +641,12 @@ const CalendarPage: React.FC = () => {
 
           {/* Right Side: Day Details & Upcoming */}
           <div className="xl:col-span-1 flex flex-col gap-6">
-            <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl p-6 flex flex-col gap-6 sticky top-6">
+            <div className="bg-card rounded-[2rem] border border-border shadow-xl p-6 flex flex-col gap-6 sticky top-6">
               <div>
-                <h3 className="text-lg font-bold text-slate-800">
+                <h3 className="text-lg font-bold text-text-main">
                   {selectedDate ? `Events for ${monthName} ${selectedDate}` : 'Select a date'}
                 </h3>
-                <p className="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-wider">
+                <p className="text-xs font-semibold text-text-muted mt-1 uppercase tracking-wider">
                   {selectedDate ? (MOCK_EVENTS[selectedDate]?.length || 0) : 0} scheduled events
                 </p>
               </div>
@@ -651,25 +661,25 @@ const CalendarPage: React.FC = () => {
                         exit={{ opacity: 0, scale: 0.95 }}
                         key={event.id}
                         onClick={() => setActiveEvent(event)}
-                        className="group bg-slate-50 border border-slate-100 rounded-2xl p-4 hover:bg-white hover:shadow-xl hover:border-transparent transition-all duration-300 cursor-pointer"
+                        className="group bg-page border border-border rounded-2xl p-4 hover:bg-card hover:shadow-xl hover:border-primary/20 transition-all duration-300 cursor-pointer"
                       >
-                        <div className="flex justify-between items-start mb-3">
-                          <div className={`p-2 rounded-xl bg-white shadow-sm ${event.color.replace('bg-', 'text-')}`}>
+                        <div className="flex justify-between items-start mb-3 text-text-muted">
+                        <div className={`p-2 rounded-xl bg-card shadow-sm`} style={{ color: EVENT_COLORS[event.color]?.text || EVENT_COLORS.primary.text }}>
                             <Clock size={18} />
                           </div>
-                          <button className="p-1 text-slate-300 hover:text-slate-600">
+                          <button className="p-1 text-text-muted hover:text-text-main">
                             <MoreVertical size={16} />
                           </button>
                         </div>
-                        <h4 className="font-bold text-slate-800 mb-1 group-hover:text-primary transition-colors">{event.title}</h4>
-                        <p className="text-xs font-medium text-slate-500 mb-4 leading-relaxed">{event.description}</p>
+                        <h4 className="font-bold text-text-main mb-1 group-hover:text-primary transition-colors">{event.title}</h4>
+                        <p className="text-xs font-medium text-text-muted mb-4 leading-relaxed">{event.description}</p>
 
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-text-muted">
                             <Clock size={12} />
                             {event.time}
                           </div>
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-text-muted">
                             <Users size={12} />
                             4 Team Members
                           </div>
@@ -683,10 +693,10 @@ const CalendarPage: React.FC = () => {
                       animate={{ opacity: 1 }}
                       className="flex flex-col items-center justify-center py-12 text-center"
                     >
-                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
+                      <div className="w-16 h-16 bg-page rounded-full flex items-center justify-center text-text-muted/30 mb-4">
                         <CalendarIcon size={32} />
                       </div>
-                      <p className="text-sm font-bold text-slate-400">No events scheduled for this day</p>
+                      <p className="text-sm font-bold text-text-muted/50">No events scheduled for this day</p>
                       <button onClick={() => setShowAddEvent(true)} className="mt-4 text-xs font-bold text-primary hover:underline">Add an event</button>
                     </motion.div>
                   )}
@@ -696,7 +706,7 @@ const CalendarPage: React.FC = () => {
               {selectedDate && (
                 <button
                   onClick={() => setShowAddTask(true)}
-                  className="w-full py-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl font-bold text-sm transition-colors border border-dashed border-slate-200"
+                  className="w-full py-3 bg-page hover:bg-card text-text-muted rounded-xl font-bold text-sm transition-colors border border-dashed border-border"
                 >
                   + Add task for this day
                 </button>

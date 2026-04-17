@@ -13,37 +13,32 @@ const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = f
   const navigate = useNavigate();
   return (
     <div
-      className={`flex items-center ${isCollapsed ? 'justify-center mx-2' : 'justify-between px-4'} py-2.5 rounded-xl cursor-pointer transition-all duration-200`}
-      style={
-        active
-          ? { backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }
-          : undefined
-      }
+      className={`flex items-center ${isCollapsed ? 'justify-center mx-2' : 'justify-between px-4'} py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+        active ? 'bg-primary/10 text-primary' : 'text-text-muted hover:bg-page hover:text-text-main'
+      }`}
       title={isCollapsed ? label : undefined}
       onClick={() => path && navigate(path)}
     >
       <div className={`flex items-center ${isCollapsed ? '' : 'gap-3'}`}>
         <Icon
           size={20}
-          style={{ color: active ? 'var(--primary)' : undefined }}
-          className={active ? '' : 'text-slate-400'}
+          className={active ? 'text-primary' : 'text-text-muted'}
         />
         {!isCollapsed && (
-          <span className={`text-sm font-${active ? 'semibold' : 'medium'}`} style={active ? { color: 'var(--primary)' } : { color: 'var(--text-muted)' }}>
+          <span className={`text-sm ${active ? 'font-bold' : 'font-semibold'}`}>
             {label}
           </span>
         )}
       </div>
       {!isCollapsed && badge && (
-        <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
+        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-page text-text-muted">
           {badge}
         </span>
       )}
       {!isCollapsed && hasDropdown && (
         <button
           onClick={(e) => { e.stopPropagation(); onPlusClick?.(); }}
-          className="p-0.5 rounded-md transition-colors text-slate-400 hover:text-slate-700"
-          style={{ '--hover-color': 'var(--primary)' } as any}
+          className="p-1 rounded-md transition-colors text-text-muted hover:text-primary hover:bg-white/10"
           title="Add Task"
         >
           <Plus size={16} />
@@ -108,7 +103,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <div className="flex items-center gap-2 font-bold z-10" style={{ color: 'var(--primary)' }}>
                 <Zap size={16} fill="currentColor" /> Activate Premium
               </div>
-              <p className="text-xs font-medium z-10 text-slate-500">Unlock all features on ProFlow</p>
+              <p className="text-[11px] font-bold z-10 text-text-muted/60">Unlock all features on ProFlow</p>
             </div>
           )}
 
@@ -165,8 +160,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <input
                 type="text"
                 placeholder="Search insights..."
-                className="bg-transparent outline-none text-sm font-medium w-full placeholder:font-normal"
-                style={{ color: 'var(--text-main)' }}
+                className="bg-transparent outline-none text-sm font-medium w-full placeholder:font-normal appearance-none border-none shadow-none"
+                style={{ color: 'var(--text-main)', background: 'transparent', border: 'none', boxShadow: 'none' }}
               />
             </div>
           </div>
@@ -211,7 +206,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       Profile
                     </div>
                     <div className="h-px my-1" style={{ backgroundColor: 'var(--border-subtle)' }}></div>
-                    <div className="px-4 py-2.5 cursor-pointer flex items-center gap-3 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950">
+                    <div
+                      className="px-4 py-2.5 cursor-pointer flex items-center gap-3 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 dark:hover:bg-rose-950"
+                      onClick={() => { window.location.href = '/login'; }}
+                    >
                       <LogOut size={16} />
                       Logout
                     </div>

@@ -16,7 +16,7 @@ const INITIAL_APPS = [
     description: 'Sync your project deadlines and meetings directly with Google Calendar.',
     icon: Calendar,
     color: 'text-blue-500',
-    bg: 'bg-primary-light',
+    bg: 'bg-primary/10',
     status: 'connected',
     category: 'Productivity'
   },
@@ -37,7 +37,7 @@ const INITIAL_APPS = [
     description: 'Import Jira issues as tasks and keep status synced across both platforms.',
     icon: Bug,
     color: 'text-primary',
-    bg: 'bg-primary-light',
+    bg: 'bg-primary/10',
     status: 'disconnected',
     category: 'Management',
   }
@@ -62,17 +62,17 @@ const WebhookModal = ({ isOpen, onClose, onSave, app }: any) => {
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="bg-white rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl relative z-10"
+        className="bg-card rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl relative z-10 border border-border"
       >
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-black text-slate-800">Integrate Zoho Cliq</h2>
-            <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full text-slate-400"><X size={20} /></button>
+            <h2 className="text-2xl font-black text-text-main">Integrate Zoho Cliq</h2>
+            <button onClick={onClose} className="p-2 hover:bg-page rounded-full text-text-muted"><X size={20} /></button>
           </div>
 
           <div className="space-y-6">
-            <div className="p-4 bg-orange-50 rounded-2xl flex gap-4 border border-orange-100">
-              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-orange-500 shrink-0">
+            <div className="p-4 bg-orange-500/10 rounded-2xl flex gap-4 border border-orange-500/20">
+              <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-orange-500 shrink-0">
                 <Link size={20} />
               </div>
               <p className="text-sm text-orange-800 font-medium">
@@ -81,11 +81,11 @@ const WebhookModal = ({ isOpen, onClose, onSave, app }: any) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Webhook URL</label>
+              <label className="text-xs font-black text-text-muted uppercase tracking-widest ml-1">Webhook URL</label>
               <input
                 type="text"
                 placeholder="https://cliq.zoho.com/api/v2/channelsbyname/..."
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-medium outline-none focus:border-orange-300 transition-all"
+                className="w-full bg-page border border-border rounded-2xl px-5 py-4 text-sm font-medium outline-none focus:border-orange-300 transition-all font-sans text-text-main"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
@@ -163,16 +163,16 @@ const JiraModal = ({ isOpen, onClose, onSave, app }: any) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
-      <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} className="bg-white rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl relative z-10" >
+      <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} className="bg-card rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl relative z-10" >
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-black text-slate-800">Setup Jira Sync</h2>
-            <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full text-slate-400"><X size={20} /></button>
+            <h2 className="text-2xl font-black text-text-main">Setup Jira Sync</h2>
+            <button onClick={onClose} className="p-2 hover:bg-page rounded-full text-text-muted"><X size={20} /></button>
           </div>
 
           <div className="space-y-5">
-            <div className="p-4 bg-primary-light rounded-2xl border border-primary-light flex items-start gap-4">
-              <div className="p-2 bg-white rounded-xl text-primary shadow-sm shrink-0">
+            <div className="p-4 bg-primary/10 rounded-2xl border border-primary/20 flex items-start gap-4">
+              <div className="p-2 bg-card rounded-xl text-primary shadow-sm shrink-0">
                 <AlertCircle size={20} />
               </div>
               <div className="space-y-1">
@@ -191,31 +191,31 @@ const JiraModal = ({ isOpen, onClose, onSave, app }: any) => {
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Jira Site URL</label>
+              <label className="text-xs font-black text-text-muted uppercase tracking-widest ml-1">Jira Site URL</label>
               <input
                 type="text"
                 placeholder="https://your-domain.atlassian.net"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-medium outline-none focus:border-blue-300 transition-all"
+                className="w-full bg-page border border-border rounded-2xl px-5 py-3.5 text-sm font-medium outline-none focus:border-primary transition-all text-text-main"
                 value={data.url}
                 onChange={(e) => setData({ ...data, url: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Atlassian Email</label>
+              <label className="text-xs font-black text-text-muted uppercase tracking-widest ml-1">Atlassian Email</label>
               <input
                 type="email"
                 placeholder="name@company.com"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-medium outline-none focus:border-blue-300 transition-all"
+                className="w-full bg-page border border-border rounded-2xl px-5 py-3.5 text-sm font-medium outline-none focus:border-primary transition-all text-text-main"
                 value={data.email}
                 onChange={(e) => setData({ ...data, email: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">API Token</label>
+              <label className="text-xs font-black text-text-muted uppercase tracking-widest ml-1">API Token</label>
               <input
                 type="password"
                 placeholder="••••••••••••••••"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-medium outline-none focus:border-blue-300 transition-all"
+                className="w-full bg-page border border-border rounded-2xl px-5 py-3.5 text-sm font-medium outline-none focus:border-primary transition-all text-text-main"
                 value={data.token}
                 onChange={(e) => setData({ ...data, token: e.target.value })}
               />
@@ -281,26 +281,26 @@ const IntegrationCard = ({ app, onUpdate }: any) => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         whileHover={{ y: -4 }}
-        className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col h-full group"
+        className="bg-card p-6 rounded-[24px] border border-border shadow-sm hover:shadow-md transition-all flex flex-col h-full group"
       >
         <div className="flex justify-between items-start mb-6">
           <div className={`w-14 h-14 rounded-2xl ${app.bg} flex items-center justify-center transition-transform group-hover:scale-110`}>
             <app.icon className={app.color} size={30} />
           </div>
-          <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isConnected ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
+          <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isConnected ? 'bg-emerald-500/10 text-emerald-600' : 'bg-page text-text-muted'}`}>
             {isConnected ? 'Connected' : 'Not Linked'}
           </div>
         </div>
 
         <div className="flex-1">
-          <h3 className="text-lg font-bold text-slate-800 mb-2">{app.name}</h3>
-          <p className="text-sm text-slate-500 font-medium leading-relaxed">
+          <h3 className="text-lg font-bold text-text-main mb-2">{app.name}</h3>
+          <p className="text-sm text-text-muted font-medium leading-relaxed">
             {app.description}
           </p>
           {isConnected && (app.webhookUrl || app.jiraUrl) && (
-            <div className="mt-4 p-3 bg-slate-50 rounded-xl flex items-center gap-2 border border-slate-100">
-              <Link size={14} className="text-slate-400" />
-              <span className="text-[11px] font-medium text-slate-500 truncate">{app.webhookUrl || app.jiraUrl}</span>
+            <div className="mt-4 p-3 bg-page rounded-xl flex items-center gap-2 border border-border">
+              <Link size={14} className="text-text-muted" />
+              <span className="text-[11px] font-medium text-text-muted truncate">{app.webhookUrl || app.jiraUrl}</span>
             </div>
           )}
         </div>
@@ -312,7 +312,7 @@ const IntegrationCard = ({ app, onUpdate }: any) => {
                 <div className="flex w-full gap-2">
                   <button
                     onClick={() => app.id === 'zoho-cliq' ? setShowWebhookModal(true) : setShowJiraModal(true)}
-                    className="flex-1 py-2.5 px-3 bg-slate-50 text-slate-600 rounded-xl text-xs font-black hover:bg-slate-100 transition-colors flex items-center justify-center gap-1.5"
+                    className="flex-1 py-2.5 px-3 bg-page text-text-main rounded-xl text-xs font-black hover:bg-border transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Settings2 size={14} /> EDIT
                   </button>
@@ -332,7 +332,7 @@ const IntegrationCard = ({ app, onUpdate }: any) => {
                 </div>
               ) : (
                 <>
-                  <button className="flex-1 py-2.5 px-4 bg-slate-50 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors flex items-center justify-center gap-2">
+                  <button className="flex-1 py-2.5 px-4 bg-page text-text-main rounded-xl text-sm font-bold hover:bg-border transition-colors flex items-center justify-center gap-2">
                     <Settings2 size={16} /> Configure
                   </button>
                   <button onClick={handleDelete} className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors">
@@ -403,21 +403,22 @@ const Integrations: React.FC = () => {
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-4">
           <div className="space-y-1">
-            <h1 className="text-[32px] font-extrabold text-slate-800 tracking-tight">Integrations</h1>
-            <p className="text-slate-500 font-medium flex items-center gap-2">
+            <h1 className="text-[32px] font-extrabold text-text-main tracking-tight">Integrations</h1>
+            <p className="text-text-muted font-medium flex items-center gap-2">
               Connect your favorite tools to automate your workflow <Zap size={16} className="text-amber-500 fill-amber-500" />
             </p>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm text-sm font-medium text-slate-600 w-full md:w-80 focus-within:border-violet-300 transition-all">
-              <Search size={18} className="mr-3 text-slate-400" />
+            <div className="flex items-center bg-card border border-border rounded-2xl px-5 py-3 shadow-sm text-sm font-medium text-text-muted w-full md:w-80 focus-within:border-primary/30 transition-all font-sans">
+              <Search size={18} className="mr-3 text-text-muted opacity-50" />
               <input
                 type="text"
                 placeholder="Find an integration..."
-                className="bg-transparent outline-none w-full"
+                className="bg-transparent outline-none w-full text-text-main"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                style={{ background: 'transparent' }}
               />
             </div>
           </div>

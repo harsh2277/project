@@ -7,6 +7,109 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+/* ─── Activity Hours Bar Chart ──────────────────────────────── */
+const HOURS_DATA = [
+  { month: 'Jan', logged: 38, manual: 8 },
+  { month: 'Feb', logged: 22, manual: 6 },
+  { month: 'Mar', logged: 55, manual: 14 },
+  { month: 'Apr', logged: 30, manual: 4 },
+  { month: 'May', logged: 20, manual: 10 },
+  { month: 'Jun', logged: 68, manual: 18 },
+  { month: 'Jul', logged: 48, manual: 9 },
+  { month: 'Aug', logged: 28, manual: 13 },
+  { month: 'Sep', logged: 42, manual: 7 },
+  { month: 'Oct', logged: 75, manual: 22 },
+  { month: 'Nov', logged: 50, manual: 16 },
+  { month: 'Dec', logged: 33, manual: 9 },
+];
+
+const ActivityHoursChart = () => {
+  const [activeBar, setActiveBar] = React.useState<string | null>(null);
+
+  return (
+    <div
+      className="flex items-end justify-between gap-6 mt-6"
+      style={{ height: '240px' }}
+      onMouseLeave={() => setActiveBar(null)}
+    >
+      {HOURS_DATA.map((item) => {
+        const isActive = activeBar === item.month;
+        return (
+          <div
+            key={item.month}
+            className="flex flex-col items-center gap-2 relative h-full cursor-pointer flex-1"
+            onMouseEnter={() => setActiveBar(item.month)}
+          >
+            {/* Tooltip */}
+            <div
+              className={`absolute left-1/2 -translate-x-1/2 bg-card p-2.5 rounded-[14px] shadow-lg border border-border text-xs z-20 w-28 transition-all duration-200 pointer-events-none ${isActive ? 'opacity-100' : 'opacity-0 invisible'
+                }`}
+              style={{
+                bottom: `${item.logged + item.manual + 5}%`,
+                transform: `translateX(-50%) translateY(${isActive ? '0' : '10px'})`
+              }}
+            >
+              <p className="text-text-muted mb-1.5 font-medium">{item.month} hours</p>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-2 h-2 rounded-sm bg-primary" />
+                <span>Logged: {item.logged}h</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-sm bg-border" />
+                <span>Manual: {item.manual}h</span>
+              </div>
+            </div>
+
+            {/* Stacked bar */}
+            <div
+              className={`w-full flex flex-col justify-end rounded-[10px] overflow-hidden flex-1 transition-colors ${isActive ? 'bg-page shadow-md' : 'bg-page'
+                }`}
+            >
+              {/* Manual segment — lighter striped layer on top */}
+              <motion.div
+                className="w-full"
+                initial={{ height: 0 }}
+                whileInView={{ height: `${item.manual}%` }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, ease: "circOut", delay: HOURS_DATA.indexOf(item) * 0.05 }}
+                style={{
+                  background:
+                    'repeating-linear-gradient(45deg, transparent, transparent 2px, #AAAAAA 2px, #AAAAAA 4px)',
+                  opacity: 0.55,
+                }}
+              />
+              {/* Logged segment — solid dark */}
+              <motion.div
+                className={`w-full rounded-b-[10px] ${isActive ? 'bg-text-main' : 'bg-primary'
+                  }`}
+                initial={{ height: 0 }}
+                whileInView={{ height: `${item.logged}%` }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, ease: "circOut", delay: HOURS_DATA.indexOf(item) * 0.05 }}
+              >
+                {isActive && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="w-2 h-2 bg-white rounded-full mx-auto mt-1 opacity-80"
+                  />
+                )}
+              </motion.div>
+            </div>
+
+            <span
+              className={`text-[11px] font-semibold shrink-0 transition-colors ${isActive ? 'text-text-main' : 'text-text-muted'
+                }`}
+            >
+              {item.month}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }: any) => {
   const [currentMonthDate, setCurrentMonthDate] = React.useState(new Date(2023, 4, 1)); // Default to May 2023 context
   const [selectionStart, setSelectionStart] = React.useState<Date | null>(new Date(2023, 4, 28));
@@ -100,11 +203,11 @@ const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }
   };
 
   const renderDay = (day: any, i: number) => {
-    let bgClasses = "text-slate-700 hover:bg-slate-100 rounded-md";
+    let bgClasses = "text-text-main hover:bg-page rounded-md";
     let innerContent = <>{day.d}</>;
 
     if (day.gray) {
-      bgClasses = "text-slate-300";
+      bgClasses = "text-text-muted/30";
     } else if (day.sel) {
       if (day.sel === 'start-only') {
         bgClasses = "bg-primary text-white rounded-md relative z-10";
@@ -113,7 +216,7 @@ const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }
       } else if (day.sel === 'mid') {
         bgClasses = "bg-primary text-white rounded-none relative z-10";
       } else if (day.sel === 'end') {
-        bgClasses = "bg-blue-800 text-white rounded-r-lg rounded-l-none relative z-10";
+        bgClasses = "bg-primary-dark text-white rounded-r-lg rounded-l-none relative z-10";
         innerContent = (
           <>
             {day.d}
@@ -140,38 +243,38 @@ const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="absolute right-0 top-full mt-2 bg-white border border-slate-200 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] z-50 flex flex-col md:flex-row overflow-hidden max-w-[90vw]"
+        className="absolute right-0 top-full mt-2 bg-card border border-border rounded-xl shadow-2xl z-50 flex flex-col md:flex-row overflow-hidden max-w-[90vw]"
       >
         {/* Left Sidebar Preset Ranges */}
-        <div className="w-56 border-r border-slate-100 bg-white py-2 shrink-0 flex flex-col">
+        <div className="w-56 border-r border-border bg-card py-2 shrink-0 flex flex-col">
           {presets.map((preset) => (
             <div
               key={preset}
-              className="px-6 py-[14px] flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
+              className="px-6 py-[14px] flex items-center justify-between cursor-pointer hover:bg-page transition-colors"
               onClick={() => {
                 onSelectRange(preset);
                 onClose();
               }}
             >
-              <span className="text-[14.5px] text-slate-600">{preset}</span>
-              {selectedRange === preset && <Check size={18} className="text-blue-500" strokeWidth={2.5} />}
+              <span className="text-[14.5px] text-text-muted">{preset}</span>
+              {selectedRange === preset && <Check size={18} className="text-primary" strokeWidth={2.5} />}
             </div>
           ))}
         </div>
 
         {/* Right Main Calendar Area */}
-        <div className="flex-1 flex flex-col w-[640px] bg-white">
+        <div className="flex-1 flex flex-col w-[640px] bg-card">
           <div className="flex px-5 pt-5 pb-1 gap-8">
             {/* Left Calendar */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-5">
-                <button onClick={prevMonth} className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-colors"><ChevronLeft size={20} /></button>
-                <span className="text-[15px] font-bold text-slate-700">{leftMonthName}</span>
+                <button onClick={prevMonth} className="p-1.5 hover:bg-page rounded-md text-text-muted transition-colors"><ChevronLeft size={20} /></button>
+                <span className="text-[15px] font-bold text-text-main">{leftMonthName}</span>
                 <div className="w-6"></div>
               </div>
               <div className="grid grid-cols-7 gap-y-2 gap-x-0 mb-4 px-1">
                 {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                  <div key={day} className="text-center text-[13px] font-semibold text-slate-400">{day}</div>
+                  <div key={day} className="text-center text-[13px] font-semibold text-text-muted">{day}</div>
                 ))}
               </div>
               <div className="grid grid-cols-7 gap-y-1 gap-x-0 outline-none select-none px-1">
@@ -180,18 +283,18 @@ const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }
             </div>
 
             {/* Vertical Divider */}
-            <div className="w-[1px] bg-slate-100 self-stretch my-2"></div>
+            <div className="w-[1px] bg-border self-stretch my-2"></div>
 
             {/* Right Calendar */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-5">
                 <div className="w-6"></div>
-                <span className="text-[15px] font-bold text-slate-700">{rightMonthName}</span>
-                <button onClick={nextMonth} className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-colors"><ChevronRight size={20} /></button>
+                <span className="text-[15px] font-bold text-text-main">{rightMonthName}</span>
+                <button onClick={nextMonth} className="p-1.5 hover:bg-page rounded-md text-text-muted transition-colors"><ChevronRight size={20} /></button>
               </div>
               <div className="grid grid-cols-7 gap-y-2 gap-x-0 mb-4 px-1">
                 {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                  <div key={day} className="text-center text-[13px] font-semibold text-slate-400">{day}</div>
+                  <div key={day} className="text-center text-[13px] font-semibold text-text-muted">{day}</div>
                 ))}
               </div>
               <div className="grid grid-cols-7 gap-y-1 gap-x-0 outline-none select-none px-1">
@@ -201,12 +304,12 @@ const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }
           </div>
 
           {/* Footer Dates */}
-          <div className="border-t border-slate-100 p-5 flex items-center justify-center gap-6 mt-auto">
-            <div className="px-5 py-2.5 border border-slate-200 rounded-lg text-[15.5px] tracking-wide text-slate-700 bg-white min-w-[150px] text-center shadow-sm">
+          <div className="border-t border-border p-5 flex items-center justify-center gap-6 mt-auto">
+            <div className="px-5 py-2.5 border border-border rounded-lg text-[15.5px] tracking-wide text-text-main bg-page min-w-[150px] text-center shadow-sm">
               {formatDate(selectionStart)}
             </div>
-            <span className="text-slate-500 font-bold text-lg">→</span>
-            <div className="px-5 py-2.5 border border-slate-200 rounded-lg text-[15.5px] tracking-wide text-slate-700 bg-white min-w-[150px] text-center shadow-sm">
+            <span className="text-text-muted font-bold text-lg">→</span>
+            <div className="px-5 py-2.5 border border-border rounded-lg text-[15.5px] tracking-wide text-text-main bg-page min-w-[150px] text-center shadow-sm">
               {formatDate(selectionEnd)}
             </div>
           </div>
@@ -218,101 +321,44 @@ const CustomDateRangePicker = ({ isOpen, onClose, selectedRange, onSelectRange }
 
 const SidebarItem = ({ icon: Icon, label, active = false, badge, hasDropdown = false, isCollapsed = false }: any) => (
   <div
-    className={`flex items-center ${isCollapsed ? 'justify-center mx-2' : 'justify-between px-4'} py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${active ? 'bg-violet-100/50 text-primary font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 font-medium'}`}
+    className={`flex items-center ${isCollapsed ? 'justify-center mx-2' : 'justify-between px-4'} py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${active ? 'bg-primary/10 text-primary font-semibold' : 'text-text-muted hover:bg-page hover:text-text-main font-medium'}`}
     title={isCollapsed ? label : undefined}
   >
     <div className={`flex items-center ${isCollapsed ? '' : 'gap-3'}`}>
-      <Icon size={20} className={active ? 'text-primary' : 'text-slate-400'} />
+      <Icon size={20} className={active ? 'text-primary' : 'text-text-muted'} />
       {!isCollapsed && <span className="text-sm">{label}</span>}
     </div>
     {!isCollapsed && badge && (
-      <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
+      <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-page text-text-muted">
         {badge}
       </span>
     )}
     {!isCollapsed && hasDropdown && (
-      <Plus size={16} className="text-slate-400" />
+      <Plus size={16} className="text-text-muted" />
     )}
   </div>
 );
 
 const StatCard = ({ icon: Icon, title, value, change, isPositive }: any) => (
-  <div className="bg-white p-5 rounded-2xl border border-[#f5f5f5] flex flex-col justify-between">
+  <div className="bg-card p-5 rounded-2xl border border-border flex flex-col justify-between">
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center text-primary">
+        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
           <Icon size={20} />
         </div>
-        <span className="text-sm font-semibold text-slate-500">{title}</span>
+        <span className="text-sm font-semibold text-text-muted">{title}</span>
       </div>
     </div>
     <div className="flex items-end gap-3">
-      <h3 className="text-3xl font-bold text-slate-800">{value}</h3>
-      <span className={`text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 mb-1 ${isPositive ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
-        }`}>
+      <h3 className="text-2xl font-bold text-text-main">{value}</h3>
+      <span className={`text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 mb-1 ${isPositive ? 'text-emerald-600 bg-emerald-500/10' : 'text-rose-600 bg-rose-500/10'}`}>
         {isPositive ? '▲' : '▼'} {change}
       </span>
     </div>
-    <p className="text-xs text-slate-400 mt-2">{isPositive ? 'Increase' : 'Decrease'} from Last Month</p>
+    <p className="text-xs text-text-muted mt-2">{isPositive ? 'Increase' : 'Decrease'} from Last Month</p>
   </div>
 );
 
-const BarChartMockup = () => {
-  const [activeBar, setActiveBar] = React.useState<string | null>('Jun');
-  const data = [
-    { month: 'Jan', tracked: 40, manual: 10 },
-    { month: 'Feb', tracked: 20, manual: 8 },
-    { month: 'Mar', tracked: 60, manual: 15 },
-    { month: 'Apr', tracked: 35, manual: 5 },
-    { month: 'May', tracked: 25, manual: 12 },
-    { month: 'Jun', tracked: 70, manual: 20 },
-    { month: 'Jul', tracked: 50, manual: 10 },
-    { month: 'Aug', tracked: 30, manual: 15 },
-    { month: 'Sep', tracked: 45, manual: 8 },
-    { month: 'Oct', tracked: 80, manual: 25 },
-    { month: 'Nov', tracked: 55, manual: 18 },
-    { month: 'Dec', tracked: 35, manual: 10 },
-  ];
-
-  return (
-    <div className="flex items-end justify-between h-56 mt-8 px-2" onMouseLeave={() => setActiveBar('Jun')}>
-      {data.map((item, i) => {
-        const isActive = activeBar === item.month;
-        return (
-          <div
-            key={i}
-            className="flex flex-col items-center gap-2 relative h-full pt-6 cursor-pointer"
-            onMouseEnter={() => setActiveBar(item.month)}
-          >
-            {/* Tooltip mockup for active bar */}
-            <div className={`absolute top-0 bg-white p-2 rounded-lg shadow-lg border border-slate-100 text-xs z-20 w-24 transition-all duration-200 transform pointer-events-none ${isActive ? 'opacity-100 -translate-y-1' : 'opacity-0 translate-y-0'}`}>
-              <p className="text-slate-400 mb-1">Working</p>
-              <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-sm bg-primary"></div> Tracked: {item.tracked}</div>
-              <div className="flex items-center gap-1 mt-1"><div className="w-2 h-2 rounded-sm bg-slate-300"></div> Manual: {item.manual}</div>
-            </div>
-            <div className={`w-8 flex flex-col justify-end rounded-t-sm rounded-b-md overflow-hidden relative flex-1 transition-colors ${isActive ? 'bg-slate-100' : 'bg-slate-50'}`}>
-              <motion.div
-                className="w-full bg-primary-light transition-all"
-                initial={{ height: 0 }}
-                animate={{ height: `${item.manual}%` }}
-                transition={{ duration: 1, delay: i * 0.05 }}
-              ></motion.div>
-              <motion.div
-                className="w-full rounded-b-md transition-all bg-primary"
-                initial={{ height: 0 }}
-                animate={{ height: `${item.tracked}%` }}
-                transition={{ duration: 1, delay: i * 0.05 }}
-              >
-                <div className={`w-2 h-2 bg-white rounded-full mx-auto mt-1 transition-opacity ${isActive ? 'opacity-100' : 'opacity-0'}`}></div>
-              </motion.div>
-            </div>
-            <span className={`text-xs font-semibold transition-colors ${isActive ? 'text-primary' : 'text-slate-400'}`}>{item.month}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
 
 const DonutChartMockup = () => {
   const [activeSegment, setActiveSegment] = React.useState<string | null>(null);
@@ -325,7 +371,7 @@ const DonutChartMockup = () => {
           <motion.circle
             onMouseEnter={() => setActiveSegment('late')}
             onMouseLeave={() => setActiveSegment(null)}
-            cx="50" cy="50" r="40" fill="transparent" stroke="#cccccc"
+            cx="50" cy="50" r="40" fill="transparent" stroke="#E11D48" // Rose-600
             initial={{ pathLength: 0, strokeWidth: 16 }}
             animate={{ pathLength: 0.185, strokeWidth: activeSegment === 'late' ? 22 : 16 }}
             transition={{ duration: activeSegment ? 0.2 : 1.5, ease: "easeOut" }}
@@ -338,7 +384,7 @@ const DonutChartMockup = () => {
           <motion.circle
             onMouseEnter={() => setActiveSegment('pending')}
             onMouseLeave={() => setActiveSegment(null)}
-            cx="50" cy="50" r="40" fill="transparent" stroke="var(--primary-muted)"
+            cx="50" cy="50" r="40" fill="transparent" stroke="#F59E0B" // Amber-500
             initial={{ pathLength: 0, strokeWidth: 16 }}
             animate={{ pathLength: 0.085, strokeWidth: activeSegment === 'pending' ? 22 : 16 }}
             transition={{ duration: activeSegment ? 0.2 : 1.5, ease: "easeOut" }}
@@ -361,10 +407,10 @@ const DonutChartMockup = () => {
         </g>
       </svg>
       <div className="absolute text-center pointer-events-none">
-        <h2 className="text-3xl font-bold text-slate-800 transition-all duration-300">
+        <h2 className="text-3xl font-bold text-text-main transition-all duration-300">
           {activeSegment === 'late' ? '20%' : activeSegment === 'pending' ? '10%' : activeSegment === 'done' ? '70%' : '70%'}
         </h2>
-        <p className="text-xs text-slate-500 font-medium mt-1 transition-all duration-300">
+        <p className="text-xs text-text-muted font-medium mt-1 transition-all duration-300">
           {activeSegment === 'late' ? 'Late' : activeSegment === 'pending' ? 'Pending' : 'Completed'}
         </p>
       </div>
@@ -404,14 +450,14 @@ const LineChartMockup = () => {
     >
       <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 200">
         {/* Grid lines */}
-        <line x1="0" y1="50" x2="1000" y2="50" stroke="#f1f5f9" strokeWidth="2" />
-        <line x1="0" y1="100" x2="1000" y2="100" stroke="#f1f5f9" strokeWidth="2" />
-        <line x1="0" y1="150" x2="1000" y2="150" stroke="#f1f5f9" strokeWidth="2" />
+        <line x1="0" y1="50" x2="1000" y2="50" stroke="var(--border)" strokeWidth="1" strokeOpacity="0.5" />
+        <line x1="0" y1="100" x2="1000" y2="100" stroke="var(--border)" strokeWidth="1" strokeOpacity="0.5" />
+        <line x1="0" y1="150" x2="1000" y2="150" stroke="var(--border)" strokeWidth="1" strokeOpacity="0.5" />
 
-        {/* Booked Hours (Orange) */}
-        <motion.path whileHover={{ strokeWidth: 5 }} d="M0,150 C100,100 200,180 300,140 C400,100 500,40 600,100 C700,160 800,40 900,50 C950,55 1000,80 1000,80" fill="none" stroke="#F97316" strokeWidth="3" vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, ease: "easeInOut" }} className="transition-all" />
+        {/* Booked Hours (Violet for contrast with primary) */}
+        <motion.path whileHover={{ strokeWidth: 5 }} d="M0,150 C100,100 200,180 300,140 C400,100 500,40 600,100 C700,160 800,40 900,50 C950,55 1000,80 1000,80" fill="none" stroke="#8B5CF6" strokeWidth="3" vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, ease: "easeInOut" }} className="transition-all" />
 
-        {/* Available */}
+        {/* Available (Primary) */}
         <motion.path whileHover={{ strokeWidth: 5 }} d="M0,180 C100,160 200,90 300,60 C400,30 500,130 600,150 C700,170 800,120 900,100 C950,90 1000,110 1000,110" fill="none" stroke="var(--primary)" strokeWidth="3" vectorEffect="non-scaling-stroke" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2, ease: "easeInOut", delay: 0.2 }} className="transition-all" />
       </svg>
 
@@ -419,31 +465,31 @@ const LineChartMockup = () => {
       {hoverPos && (
         <>
           <div
-            className="absolute top-0 bottom-6 border-l-2 border-slate-300 border-dashed pointer-events-none"
+            className="absolute top-0 bottom-6 border-l-2 border-border border-dashed pointer-events-none"
             style={{ left: hoverPos.x }}
           ></div>
           <div
-            className="absolute bg-white p-3 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-100 text-xs w-36 pointer-events-none z-20 transition-transform"
+            className="absolute bg-card p-3 rounded-xl shadow-2xl border border-border text-xs w-36 pointer-events-none z-20 transition-transform"
             style={{
               left: hoverPos.x + 160 > hoverPos.width ? hoverPos.x - 160 : hoverPos.x + 15,
               top: Math.max(hoverPos.y - 60, 0)
             }}
           >
-            <p className="text-slate-400 mb-2 font-medium">Nov {activeIndex + 11}, 2024</p>
+            <p className="text-text-muted mb-2 font-medium">Nov {activeIndex + 11}, 2024</p>
             <div className="flex justify-between mb-1">
-              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-orange-500"></div> Booked Hours :</div>
-              <span className="font-bold text-slate-700">{currentData.booked}</span>
+              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-violet-500"></div> Booked :</div>
+              <span className="font-bold text-text-main">{currentData.booked}</span>
             </div>
             <div className="flex justify-between">
               <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-primary"></div> Available :</div>
-              <span className="font-bold text-slate-700">{currentData.available}</span>
+              <span className="font-bold text-text-main">{currentData.available}</span>
             </div>
           </div>
         </>
       )}
 
       {/* X-axis labels */}
-      <div className="absolute bottom-0 w-full flex justify-between text-[10px] text-slate-400 font-semibold px-4">
+      <div className="absolute bottom-0 w-full flex justify-between text-[10px] text-text-muted font-semibold px-4">
         {Array.from({ length: 18 }).map((_, i) => (
           <span key={i}>{i}</span>
         ))}
@@ -462,16 +508,16 @@ const Dashboard: React.FC = () => {
       <div className="w-full">
         {/* Dashboard Header */}
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-text-main tracking-tight">Dashboard</h1>
 
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm border border-slate-100 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-card rounded-xl shadow-sm border border-border text-sm font-semibold text-text-muted hover:bg-page transition-colors">
               <Download size={16} /> Export
             </button>
 
             <div className="relative">
               <button
-                className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm border border-slate-100 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-card rounded-xl shadow-sm border border-border text-sm font-semibold text-text-muted hover:bg-page transition-colors"
                 onClick={() => setIsDateMenuOpen(!isDateMenuOpen)}
               >
                 <CalendarIcon size={16} /> {selectedDateRange} <ChevronDown size={14} className={`ml-1 transition-transform ${isDateMenuOpen ? 'rotate-180' : ''}`} />
@@ -502,43 +548,38 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
 
             {/* Working Hours */}
-            <div className="xl:col-span-2 bg-white p-6 rounded-3xl border border-[#f5f5f5] flex flex-col h-full z-10">
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-800">Working Hours</h2>
-                  <HelpCircle size={14} className="text-slate-300" />
+            <div className="xl:col-span-2 bg-card rounded-3xl border border-border p-6 pb-0 flex flex-col h-full z-10">
+              <div className="flex justify-between items-start mb-1">
+                <div>
+                  <h2 className="text-[18px] font-bold text-text-main">Activity Hours</h2>
+                  <p className="text-[13px] font-medium text-text-muted mt-1">Logged vs manual hours — this year</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button className="px-3 py-1.5 bg-slate-50 rounded-lg text-xs font-semibold text-slate-600 flex items-center gap-1 hover:bg-slate-100">
-                    This Year <ChevronDown size={14} />
-                  </button>
-                  <button className="px-3 py-1.5 bg-slate-50 rounded-lg text-xs font-semibold text-slate-600 flex items-center gap-1 hover:bg-slate-100">
-                    All Project <ChevronDown size={14} />
-                  </button>
-                </div>
+                <span className="text-[12px] font-bold text-emerald-600 bg-emerald-500/10 px-3 py-1.5 rounded-full transition-all hover:scale-105">+14% vs last year</span>
               </div>
-              <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 mb-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-primary"></div> Tracked
+              <div className="flex items-center gap-6 text-[12px] font-bold text-text-muted mb-2 mt-4">
+                <div className="flex items-center gap-2 group cursor-pointer transition-colors hover:text-text-main">
+                  <div className="w-4 h-4 rounded-full border-2 border-primary group-hover:scale-110 transition-transform" />
+                  Logged
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-primary-light border border-slate-200"></div> Manual
+                <div className="flex items-center gap-2 group cursor-pointer transition-colors hover:text-text-main">
+                  <div className="w-4 h-4 rounded-full border-2 border-border group-hover:scale-110 transition-transform" />
+                  Manual
                 </div>
               </div>
 
-              <div className="flex-1 min-h-[220px]">
-                <BarChartMockup />
+              <div className="flex-1 min-h-[300px]">
+                <ActivityHoursChart />
               </div>
             </div>
 
             {/* Overall Progress Donut */}
-            <div className="xl:col-span-1 bg-white p-6 rounded-3xl border border-[#f5f5f5] h-full flex flex-col justify-between">
+            <div className="xl:col-span-1 bg-card p-6 rounded-3xl border border-border h-full flex flex-col justify-between">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-800">Overall Progress</h2>
-                  <HelpCircle size={14} className="text-slate-300" />
+                  <h2 className="text-lg font-bold text-text-main">Overall Progress</h2>
+                  <HelpCircle size={14} className="text-text-muted" />
                 </div>
-                <button className="px-3 py-1.5 border border-slate-100 rounded-lg text-xs font-semibold text-slate-600 flex items-center gap-1 hover:bg-slate-50">
+                <button className="px-3 py-1.5 border border-border rounded-lg text-xs font-semibold text-text-muted flex items-center gap-1 hover:bg-page">
                   See All <ChevronDown size={14} />
                 </button>
               </div>
@@ -547,18 +588,18 @@ const Dashboard: React.FC = () => {
                 <DonutChartMockup />
               </div>
 
-              <div className="flex items-center justify-around mt-8 border-t border-slate-100 pt-6 px-4 shrink-0">
+              <div className="flex items-center justify-around mt-8 border-t border-border pt-6 px-4 shrink-0">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-primary"></div>
-                  <span className="text-sm font-semibold text-slate-600">8 Done</span>
+                  <span className="text-sm font-semibold text-text-muted">8 Done</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--primary-muted)' }}></div>
-                  <span className="text-sm font-semibold text-slate-600">4 Pending</span>
+                  <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                  <span className="text-sm font-semibold text-text-muted">4 Pending</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-slate-200"></div>
-                  <span className="text-sm font-semibold text-slate-600">3 Late</span>
+                  <div className="w-3 h-3 rounded-full bg-rose-600"></div>
+                  <span className="text-sm font-semibold text-text-muted">3 Late</span>
                 </div>
               </div>
             </div>
@@ -569,54 +610,54 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
 
             {/* Project Summary Table */}
-            <div className="bg-white p-6 rounded-3xl border border-[#f5f5f5] flex flex-col h-full">
+            <div className="bg-card p-6 rounded-3xl border border-border flex flex-col h-full">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-800">Project Summary</h2>
-                  <HelpCircle size={14} className="text-slate-300" />
+                  <h2 className="text-lg font-bold text-text-main">Project Summary</h2>
+                  <HelpCircle size={14} className="text-text-muted" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="px-2 py-1 bg-slate-50 rounded-lg text-[11px] font-semibold text-slate-600 flex items-center gap-1 hover:bg-slate-100">Project <ChevronDown size={12} /></button>
-                  <button className="px-2 py-1 bg-slate-50 rounded-lg text-[11px] font-semibold text-slate-600 flex items-center gap-1 hover:bg-slate-100">Status <ChevronDown size={12} /></button>
+                  <button className="px-2 py-1 bg-page rounded-lg text-[11px] font-semibold text-text-muted flex items-center gap-1 hover:bg-card border border-border">Project <ChevronDown size={12} /></button>
+                  <button className="px-2 py-1 bg-page rounded-lg text-[11px] font-semibold text-text-muted flex items-center gap-1 hover:bg-card border border-border">Status <ChevronDown size={12} /></button>
                 </div>
               </div>
 
               <div className="overflow-x-auto flex-1">
                 <table className="w-full text-left" style={{ borderSpacing: '0 8px', borderCollapse: 'separate' }}>
                   <thead>
-                    <tr className="text-xs font-bold text-slate-800 bg-[#f5f5f5]">
+                    <tr className="text-xs font-bold text-text-main bg-page">
                       <th className="py-3 px-4 rounded-l-xl">Project Name</th>
                       <th className="py-3 px-4">Due Date</th>
                       <th className="py-3 px-4 rounded-r-xl text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="text-sm font-semibold text-slate-500">
-                    <tr className="bg-[#f5f5f5]/50">
-                      <td className="py-3 px-4 rounded-l-xl w-1/2">BoostApp Social Revamp</td>
-                      <td className="py-3 px-4 w-1/4">Nov 07, 2024</td>
+                  <tbody className="text-sm font-semibold text-text-muted">
+                    <tr className="bg-page/50">
+                      <td className="py-3 px-4 rounded-l-xl w-1/2 text-text-main">BoostApp Social Revamp</td>
+                      <td className="py-3 px-4 w-1/4 text-text-muted font-medium">Nov 07, 2024</td>
                       <td className="py-3 px-4 rounded-r-xl w-1/4 text-center">
-                        <span className="inline-block px-3 py-1.5 bg-emerald-50 text-emerald-600 text-[11px] rounded-lg font-bold w-full">Completed</span>
+                        <span className="inline-block px-3 py-1.5 bg-emerald-500/10 text-emerald-600 text-[11px] rounded-lg font-bold w-full">Completed</span>
                       </td>
                     </tr>
-                    <tr className="bg-white">
-                      <td className="py-3 px-4 rounded-l-xl">Brainbubble Research</td>
-                      <td className="py-3 px-4">Nov 23, 2024</td>
+                    <tr className="bg-card">
+                      <td className="py-3 px-4 rounded-l-xl text-text-main">Brainbubble Research</td>
+                      <td className="py-3 px-4 text-text-muted font-medium">Nov 23, 2024</td>
                       <td className="py-3 px-4 rounded-r-xl text-center">
-                        <span className="inline-block px-3 py-1.5 bg-primary-light text-primary text-[11px] rounded-lg font-bold w-full">In Progress</span>
+                        <span className="inline-block px-3 py-1.5 bg-primary/10 text-primary text-[11px] rounded-lg font-bold w-full">In Progress</span>
                       </td>
                     </tr>
-                    <tr className="bg-[#f5f5f5]/50">
-                      <td className="py-3 px-4 rounded-l-xl">EcoLeadpunt Website</td>
-                      <td className="py-3 px-4">Nov 12, 2024</td>
+                    <tr className="bg-page/50">
+                      <td className="py-3 px-4 rounded-l-xl text-text-main">EcoLeadpunt Website</td>
+                      <td className="py-3 px-4 text-text-muted font-medium">Nov 12, 2024</td>
                       <td className="py-3 px-4 rounded-r-xl text-center">
-                        <span className="inline-block px-3 py-1.5 bg-orange-50 text-orange-600 text-[11px] rounded-lg font-bold w-full">Delayed</span>
+                        <span className="inline-block px-3 py-1.5 bg-orange-500/10 text-orange-600 text-[11px] rounded-lg font-bold w-full">Delayed</span>
                       </td>
                     </tr>
-                    <tr className="bg-white">
-                      <td className="py-3 px-4 rounded-l-xl">Drip Page A/B Test</td>
-                      <td className="py-3 px-4">Nov 24, 2024</td>
+                    <tr className="bg-card">
+                      <td className="py-3 px-4 rounded-l-xl text-text-main">Drip Page A/B Test</td>
+                      <td className="py-3 px-4 text-text-muted font-medium">Nov 24, 2024</td>
                       <td className="py-3 px-4 rounded-r-xl text-center">
-                        <span className="inline-block px-3 py-1.5 bg-rose-50 text-rose-600 text-[11px] rounded-lg font-bold w-full">At Risk</span>
+                        <span className="inline-block px-3 py-1.5 bg-rose-500/10 text-rose-600 text-[11px] rounded-lg font-bold w-full">At Risk</span>
                       </td>
                     </tr>
                   </tbody>
@@ -625,23 +666,23 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Workload Summary Line Chart */}
-            <div className="bg-white p-6 rounded-3xl border border-[#f5f5f5] flex flex-col h-full">
+            <div className="bg-card p-6 rounded-3xl border border-border flex flex-col h-full">
               <div className="flex justify-between items-center mb-6 shrink-0">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-800">Workload Summary</h2>
-                  <HelpCircle size={14} className="text-slate-300" />
+                  <h2 className="text-lg font-bold text-text-main">Workload Summary</h2>
+                  <HelpCircle size={14} className="text-text-muted" />
                 </div>
-                <button className="px-3 py-1.5 bg-slate-50 rounded-lg text-xs font-semibold text-slate-600 flex items-center gap-1 hover:bg-slate-100">
+                <button className="px-3 py-1.5 bg-page rounded-lg text-xs font-semibold text-text-muted flex items-center gap-1 hover:bg-card border border-border">
                   This Month <ChevronDown size={14} />
                 </button>
               </div>
 
-              <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 mb-2 px-2 shrink-0">
+              <div className="flex items-center gap-4 text-xs font-semibold text-text-muted mb-2 px-2 shrink-0">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full border-2" style={{ borderColor: 'var(--primary)' }}></div> Available
+                  <div className="w-3 h-3 rounded-full border-2 border-primary"></div> Available
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full border-2 border-orange-500"></div> Booked Hours
+                  <div className="w-3 h-3 rounded-full border-2 border-violet-500"></div> Booked Hours
                 </div>
               </div>
 
