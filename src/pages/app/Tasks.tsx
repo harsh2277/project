@@ -7,8 +7,6 @@ import {
   Clock, AlertCircle, ChevronUp, SlidersHorizontal,
   X, Flag, FolderDot, Tag, Edit2, Trash2, ExternalLink, Check
 } from 'lucide-react';
-import type { JiraTask } from '../../types/jira';
-import { JIRA_STORAGE_KEYS } from '../../types/jira';
 
 /* ─── Types ──────────────────────────────────────────────────── */
 interface Task {
@@ -37,46 +35,8 @@ const ALL_TASKS: Task[] = [
   { id: 9, title: 'Accessibility Audit', project: 'BoostVibe 2.0', projectId: '2', tag: 'QA', status: 'To Do', priority: 'Medium', due: 'Nov 22, 2026', comments: 1, description: 'Conduct full WCAG 2.1 AA accessibility audit. Fix all critical and high severity issues before launch.' },
   { id: 10, title: 'Brand Asset Export', project: 'Figma Design System', projectId: '1', tag: 'Design', status: 'Completed', priority: 'Low', due: 'Nov 25, 2026', comments: 2, description: 'Export all brand assets in SVG, PNG (1x, 2x, 3x), and WebP formats. Organise into the shared drive.' },
   { id: 11, title: 'Onboarding Flow Redesign', project: 'BoostVibe 2.0', projectId: '2', tag: 'UI', status: 'In Review', priority: 'High', due: 'Nov 28, 2026', comments: 3, description: 'Redesign the user onboarding flow to reduce drop-off. Simplify steps and add inline guidance tooltips.' },
-  { id: 12, title: 'Database Schema Review', project: 'ProService Desk', projectId: '3', tag: 'Dev', status: 'Completed', priority: 'Medium', due: 'Nov 30, 2026', comments: 0, description: 'Review current database schema for normalisation issues. Propose optimised schema and migration plan.' },
+  { id: 12, title: 'Content Model Review', project: 'ProService Desk', projectId: '3', tag: 'Dev', status: 'Completed', priority: 'Medium', due: 'Nov 30, 2026', comments: 0, description: 'Review the current data model used in the frontend and simplify the shape for easier maintenance.' },
 ];
-
-const readJson = <T,>(key: string, fallback: T): T => {
-  const raw = localStorage.getItem(key);
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-};
-
-const mapJiraPriority = (priority: string) => {
-  if (/highest|high|blocker|critical/i.test(priority)) return 'High';
-  if (/lowest|low|minor/i.test(priority)) return 'Low';
-  return 'Medium';
-};
-
-const mapJiraStatus = (status: string) => {
-  if (/done|complete|closed|resolved/i.test(status)) return 'Completed';
-  if (/review|qa|verify/i.test(status)) return 'In Review';
-  if (/progress|doing|development/i.test(status)) return 'In Progress';
-  return 'To Do';
-};
-
-const mapJiraTasks = (tasks: JiraTask[]): Task[] => {
-  return tasks.map(task => ({
-    id: `jira-${task.id}`,
-    title: `[${task.key}] ${task.title}`,
-    project: `Jira - ${task.projectName}`,
-    projectId: `jira-${task.projectKey}`,
-    tag: task.issueType === 'Bug' ? 'QA' : task.issueType === 'Story' ? 'UI' : 'Dev',
-    status: mapJiraStatus(task.status),
-    priority: mapJiraPriority(task.priority),
-    due: task.due,
-    comments: 0,
-    description: `Jira issue ${task.key}. Assignee: ${task.assignee}. Status: ${task.status}.`,
-  }));
-};
 
 /* ─── Style helpers ──────────────────────────────────────────── */
 const getTagStyle = (tag: string) => {
@@ -443,8 +403,6 @@ const AddTaskModal = ({
 
 /* ─── Main Component ─────────────────────────────────────────── */
 const Tasks = () => {
-  const [jiraConnected, setJiraConnected] = useState(localStorage.getItem(JIRA_STORAGE_KEYS.connected) === 'true');
-  const [jiraTasks, setJiraTasks] = useState<Task[]>(() => mapJiraTasks(readJson<JiraTask[]>(JIRA_STORAGE_KEYS.tasks, [])));
   const [tasks, setTasks] = useState<Task[]>(ALL_TASKS);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatus] = useState('All');
@@ -457,21 +415,14 @@ const Tasks = () => {
   const [showAddTask, setShowAddTask] = useState(false);
 
   useEffect(() => {
-    const handleStorage = () => {
-      setJiraConnected(localStorage.getItem(JIRA_STORAGE_KEYS.connected) === 'true');
-      setJiraTasks(mapJiraTasks(readJson<JiraTask[]>(JIRA_STORAGE_KEYS.tasks, [])));
-    };
-    window.addEventListener('storage', handleStorage);
-
     const handler = () => setShowAddTask(true);
     window.addEventListener('openAddTask', handler);
     return () => {
-      window.removeEventListener('storage', handleStorage);
       window.removeEventListener('openAddTask', handler);
     };
   }, []);
 
-  const totalTasks = jiraConnected ? [...tasks, ...jiraTasks] : tasks;
+  const totalTasks = tasks;
 
   const total = totalTasks.length;
   const completed = totalTasks.filter(t => t.status === 'Completed').length;

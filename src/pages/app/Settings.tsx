@@ -3,7 +3,7 @@ import { Layout } from '../../components/layout/Layout';
 import {
   User, Bell, Shield, Palette, Sliders,
   Camera, Check, ChevronRight, Moon, Sun,
-  Smartphone, Mail, Github, ExternalLink,
+  Smartphone, Mail,
   ChevronDown,
   Globe,
   Trash2,
@@ -59,6 +59,24 @@ const CustomToggle = ({ active, onToggle }: { active: boolean; onToggle: () => v
   </button>
 );
 
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  let timeoutId: ReturnType<typeof window.setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = window.setTimeout(() => {
+      reject(new Error(message));
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+    }
+  }
+}
+
 const Settings = () => {
   const { theme, setTheme } = useTheme();
   const { profile, settings, user, updateProfile, updateSettings } = useAuth();
@@ -106,23 +124,27 @@ const Settings = () => {
     setSaveError(null);
     setSaveSuccess(false);
     try {
-      await Promise.all([
-        updateProfile({
-          first_name: firstName.trim() || null,
-          last_name: lastName.trim() || null,
-          company_name: companyName.trim() || null,
-          job_title: jobTitle.trim() || null,
-          bio: bio.trim() || null,
-        }),
-        updateSettings({
-          theme,
-          email_notifications: emailNotif,
-          push_notifications: pushNotif,
-          two_factor_enabled: twoFactorEnabled,
-          language,
-          timezone,
-        }),
-      ]);
+      await withTimeout(
+        Promise.all([
+          updateProfile({
+            first_name: firstName.trim() || null,
+            last_name: lastName.trim() || null,
+            company_name: companyName.trim() || null,
+            job_title: jobTitle.trim() || null,
+            bio: bio.trim() || null,
+          }),
+          updateSettings({
+            theme,
+            email_notifications: emailNotif,
+            push_notifications: pushNotif,
+            two_factor_enabled: twoFactorEnabled,
+            language,
+            timezone,
+          }),
+        ]),
+        15000,
+        'Saving profile is taking too long. Please try again.',
+      );
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
@@ -297,17 +319,17 @@ const Settings = () => {
                     </div>
                   </SettingsSection>
 
-                  <SettingsSection title="Connected Accounts" description="Manage access from third-party platforms">
+                  <SettingsSection title="Workspace Mode" description="This project now runs entirely as a local frontend">
                     <SettingItem
-                      icon={Github}
-                      label="GitHub Integration"
-                      description="Account linked as @shakibali"
+                      icon={Globe}
+                      label="Backend Status"
+                      description="Database and external integrations have been removed"
                       rightElement={<span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-full text-[11px] font-bold">Active</span>}
                     />
                     <SettingItem
-                      icon={ExternalLink}
-                      label="Public API"
-                      description="Manage and revoke API credentials"
+                      icon={Smartphone}
+                      label="Local Storage"
+                      description="Profile and settings are saved in this browser only"
                     />
                   </SettingsSection>
                 </motion.div>

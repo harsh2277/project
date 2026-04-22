@@ -45,7 +45,6 @@ const SignUpPage: React.FC = () => {
         lastName,
         termsAccepted: agreed,
       });
-      // Supabase may require email confirmation; show a success state
       setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign up failed. Please try again.');
@@ -63,10 +62,10 @@ const SignUpPage: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <h2 className="text-[24px] font-bold text-text-main">Check your inbox!</h2>
+          <h2 className="text-[24px] font-bold text-text-main">Account created</h2>
           <p className="text-[14px] text-text-muted">
-            We've sent a confirmation email to <span className="font-semibold text-text-main">{email}</span>.
-            Click the link in the email to activate your account.
+            Your local account for <span className="font-semibold text-text-main">{email}</span> is ready.
+            Use it on the login screen to open the app.
           </p>
           <button
             onClick={() => navigate('/login')}

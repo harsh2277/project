@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Layout } from '../../components/layout/Layout';
 import {
-  Play, Pause, Square, RotateCcw, FolderDot,
+  Play, Pause, Square, FolderDot,
   CheckSquare, ChevronDown, Plus, Trash2, MoreHorizontal, X,
-  CalendarDays, TrendingUp, Zap, Timer as TimerIcon, RotateCw
+  CalendarDays, TrendingUp, Zap, Timer as TimerIcon, RotateCw, Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /* ─── Types ──────────────────────────────────────────────────── */
+type EntryStatus = 'Complete' | 'Pending';
+
 interface TimeEntry {
   id: number;
   project: string;
@@ -17,15 +19,16 @@ interface TimeEntry {
   date: string;
   startTime: string;
   endTime: string;
+  status: EntryStatus;
   color: string;
 }
 
 /* ─── Mock Data ───────────────────────────────────────────────── */
 const MOCK_ENTRIES: TimeEntry[] = [
-  { id: 1, project: 'Figma Design System', task: 'Component Audit', description: 'Reviewing button variants & tokens', duration: '01:30:00', date: 'Today', startTime: '09:00 AM', endTime: '10:30 AM', color: 'bg-primary' },
-  { id: 2, project: 'BoostVibe 2.0', task: 'API Integration', description: 'Connecting payment gateway', duration: '02:15:00', date: 'Today', startTime: '11:00 AM', endTime: '01:15 PM', color: 'bg-primary' },
-  { id: 3, project: 'ProService Desk', task: 'Layout Fixes', description: 'Mobile responsiveness', duration: '01:00:00', date: 'Yesterday', startTime: '03:00 PM', endTime: '04:00 PM', color: 'bg-emerald-500' },
-  { id: 4, project: 'Figma Design System', task: 'Dark Mode', description: 'CSS variable mapping', duration: '00:45:00', date: 'Yesterday', startTime: '10:00 AM', endTime: '10:45 AM', color: 'bg-primary' },
+  { id: 1, project: 'Figma Design System', task: 'Component Audit', description: 'Reviewing button variants & tokens', duration: '01:30:00', date: 'Today', startTime: '09:00 AM', endTime: '10:30 AM', status: 'Complete', color: 'bg-primary' },
+  { id: 2, project: 'BoostVibe 2.0', task: 'API Integration', description: 'Connecting payment gateway', duration: '02:15:00', date: 'Today', startTime: '11:00 AM', endTime: '01:15 PM', status: 'Pending', color: 'bg-primary' },
+  { id: 3, project: 'ProService Desk', task: 'Layout Fixes', description: 'Mobile responsiveness', duration: '01:00:00', date: 'Yesterday', startTime: '03:00 PM', endTime: '04:00 PM', status: 'Complete', color: 'bg-emerald-500' },
+  { id: 4, project: 'Figma Design System', task: 'Dark Mode', description: 'CSS variable mapping', duration: '00:45:00', date: 'Yesterday', startTime: '10:00 AM', endTime: '10:45 AM', status: 'Pending', color: 'bg-primary' },
 ];
 
 const PROJECTS = ['Figma Design System', 'BoostVibe 2.0', 'ProService Desk', 'Internal Admin'];
@@ -54,6 +57,9 @@ const formatTime = (s: number) => {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 };
 
+const formatClockTime = (date: Date) =>
+  date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
 const totalSeconds = (dur: string) => {
   const [h, m, s] = dur.split(':').map(Number);
   return h * 3600 + m * 60 + s;
@@ -71,6 +77,18 @@ const TimerPage: React.FC = () => {
   const [description, setDescription] = useState('');
   const [entries, setEntries] = useState<TimeEntry[]>(MOCK_ENTRIES);
   const [showNewEntry, setShowNewEntry] = useState(false);
+  const [showStopModal, setShowStopModal] = useState(false);
+  const [startedAt, setStartedAt] = useState<Date | null>(null);
+  const [stopDraft, setStopDraft] = useState<{
+    project: string;
+    task: string;
+    description: string;
+    duration: string;
+    startTime: string;
+    endTime: string;
+    status: EntryStatus;
+    color: string;
+  } | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -82,35 +100,67 @@ const TimerPage: React.FC = () => {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isRunning, isPaused]);
 
-  const handleStart = () => { setIsRunning(true); setIsPaused(false); };
+  const handleStart = () => {
+    setStartedAt(new Date());
+    setIsRunning(true);
+    setIsPaused(false);
+  };
   const handlePause = () => setIsPaused(true);
   const handleResume = () => setIsPaused(false);
   const handleStop = () => {
     setIsRunning(false);
     setIsPaused(false);
-    const newEntry: TimeEntry = {
-      id: Date.now(),
-      project, task, description: description || 'No description',
+    const end = new Date();
+    const start = startedAt ?? new Date(Date.now() - elapsed * 1000);
+    setStopDraft({
+      project,
+      task,
+      description: description || '',
       duration: formatTime(elapsed),
-      date: 'Today',
-      startTime: new Date(Date.now() - elapsed * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      endTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      startTime: formatClockTime(start),
+      endTime: formatClockTime(end),
+      status: 'Complete',
       color: projectColors[project] || 'bg-page0',
-    };
-    setEntries(prev => [newEntry, ...prev]);
-    setElapsed(0);
-    setDescription('');
+    });
+    setShowStopModal(true);
   };
-  const handleReset = () => { setIsRunning(false); setIsPaused(false); setElapsed(0); };
   const handleDelete = (id: number) => setEntries(prev => prev.filter(e => e.id !== id));
   const handleContinue = (entry: TimeEntry) => {
     setProject(entry.project);
     setTask(entry.task);
     setDescription(entry.description === 'No description' ? '' : entry.description);
     setElapsed(totalSeconds(entry.duration)); // ← resume from existing time
+    setStartedAt(new Date(Date.now() - totalSeconds(entry.duration) * 1000));
     setIsRunning(true);
     setIsPaused(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const handleConfirmStop = (draft: NonNullable<typeof stopDraft>) => {
+    const newEntry: TimeEntry = {
+      id: Date.now(),
+      project: draft.project,
+      task: draft.task,
+      description: draft.description || 'No description',
+      duration: draft.duration,
+      date: 'Today',
+      startTime: draft.startTime,
+      endTime: draft.endTime,
+      status: draft.status,
+      color: draft.color,
+    };
+    setEntries((prev) => [newEntry, ...prev]);
+    setElapsed(0);
+    setStartedAt(null);
+    setDescription('');
+    setShowStopModal(false);
+    setStopDraft(null);
+  };
+  const handleCloseStopModal = () => {
+    setShowStopModal(false);
+    setStopDraft(null);
+    setElapsed(0);
+    setStartedAt(null);
+    setDescription('');
   };
 
   const progress = Math.min((elapsed / 3600) * 100, 100);
@@ -204,11 +254,6 @@ const TimerPage: React.FC = () => {
                       <Square size={15} fill="currentColor" /> Stop
                     </button>
                   </>
-                )}
-                {elapsed > 0 && (
-                  <button onClick={handleReset} className="p-3 rounded-full text-text-muted hover:text-text-main hover:bg-page transition-all" title="Reset">
-                    <RotateCcw size={17} />
-                  </button>
                 )}
               </div>
 
@@ -344,7 +389,7 @@ const TimerPage: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr className="bg-page border-b border-border">
-                  {['Project', 'Task', 'Description', 'Date', 'Start', 'End', 'Duration', '', ''].map((h, i) => (
+                  {['Project', 'Task', 'Status', 'Description', 'Date', 'Start', 'End', 'Duration', '', ''].map((h, i) => (
                     <th key={i} className="px-6 py-3.5 text-left text-[11px] font-bold text-text-muted uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -367,6 +412,11 @@ const TimerPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-[13px] font-medium text-text-main whitespace-nowrap">{entry.task}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${entry.status === 'Complete' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}`}>
+                          {entry.status}
+                        </span>
+                      </td>
                       <td className="px-6 py-4 text-[13px] text-text-muted max-w-[200px] truncate">{entry.description}</td>
                       <td className="px-6 py-4 text-[12px] font-semibold text-text-muted whitespace-nowrap">{entry.date}</td>
                       <td className="px-6 py-4 text-[12px] font-semibold text-text-main whitespace-nowrap">{entry.startTime}</td>
@@ -409,6 +459,13 @@ const TimerPage: React.FC = () => {
             onAdd={(entry) => { setEntries(prev => [{ ...entry, id: Date.now() }, ...prev]); setShowNewEntry(false); }}
           />
         )}
+        {showStopModal && stopDraft && (
+          <StopTimerModal
+            draft={stopDraft}
+            onClose={handleCloseStopModal}
+            onSave={handleConfirmStop}
+          />
+        )}
       </AnimatePresence>
     </Layout>
   );
@@ -420,6 +477,7 @@ const ManualEntryModal = ({ onClose, onAdd }: { onClose: () => void; onAdd: (e: 
     project: PROJECTS[0], task: TASKS[PROJECTS[0]][0],
     description: '', date: 'Today',
     startTime: '09:00 AM', endTime: '10:00 AM', duration: '01:00:00',
+    status: 'Complete' as EntryStatus,
     color: projectColors[PROJECTS[0]]
   });
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
@@ -486,6 +544,14 @@ const ManualEntryModal = ({ onClose, onAdd }: { onClose: () => void; onAdd: (e: 
               <input className={inputCls + " font-mono"} placeholder="01:00:00" value={form.duration} onChange={e => set('duration', e.target.value)} />
             </div>
           </div>
+
+          <div>
+            <label className="block text-[12px] font-bold text-text-main mb-2">Status</label>
+            <select className={selectCls} value={form.status} onChange={e => set('status', e.target.value)}>
+              <option>Complete</option>
+              <option>Pending</option>
+            </select>
+          </div>
         </div>
 
         <div className="flex items-center justify-between px-7 pb-7 pt-2">
@@ -495,6 +561,119 @@ const ManualEntryModal = ({ onClose, onAdd }: { onClose: () => void; onAdd: (e: 
             className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
           >
             <Plus size={15} /> Add Entry
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+const StopTimerModal = ({
+  draft,
+  onClose,
+  onSave,
+}: {
+  draft: {
+    project: string;
+    task: string;
+    description: string;
+    duration: string;
+    startTime: string;
+    endTime: string;
+    status: EntryStatus;
+    color: string;
+  };
+  onClose: () => void;
+  onSave: (draft: {
+    project: string;
+    task: string;
+    description: string;
+    duration: string;
+    startTime: string;
+    endTime: string;
+    status: EntryStatus;
+    color: string;
+  }) => void;
+}) => {
+  const [form, setForm] = useState(draft);
+  const set = (key: keyof typeof form, value: string) => setForm((current) => ({ ...current, [key]: value }));
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/25 backdrop-blur-sm" onClick={onClose}
+      />
+      <motion.div
+        initial={{ scale: 0.94, y: 10, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.94, y: 10, opacity: 0 }}
+        className="relative bg-card rounded-[24px] border border-border shadow-2xl w-full max-w-xl overflow-hidden"
+      >
+        <div className="flex items-center justify-between px-7 pt-7 pb-5 border-b border-border">
+          <div>
+            <h2 className="text-[17px] font-bold text-text-main">Save Timer Entry</h2>
+            <p className="text-[12px] font-medium text-text-muted mt-1">Review the tracked session before adding it to the log.</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-full text-text-muted hover:text-text-main hover:bg-page transition-all">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="px-7 py-5 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[12px] font-bold text-text-main mb-2">Project</label>
+              <input className={inputCls} value={form.project} readOnly />
+            </div>
+            <div>
+              <label className="block text-[12px] font-bold text-text-main mb-2">Task Name</label>
+              <input className={inputCls} value={form.task} readOnly />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-[12px] font-bold text-text-main mb-2">Start Time</label>
+              <input className={inputCls} value={form.startTime} readOnly />
+            </div>
+            <div>
+              <label className="block text-[12px] font-bold text-text-main mb-2">End Time</label>
+              <input className={inputCls} value={form.endTime} readOnly />
+            </div>
+            <div>
+              <label className="block text-[12px] font-bold text-text-main mb-2">Total Spent</label>
+              <input className={inputCls + " font-mono"} value={form.duration} readOnly />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[12px] font-bold text-text-main mb-2">Status</label>
+            <select className={selectCls} value={form.status} onChange={(e) => set('status', e.target.value)}>
+              <option>Complete</option>
+              <option>Pending</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[12px] font-bold text-text-main mb-2">Description</label>
+            <textarea
+              rows={4}
+              className={inputCls + " resize-none py-3"}
+              placeholder="Write what you completed in this session..."
+              value={form.description}
+              onChange={(e) => set('description', e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between px-7 pb-7 pt-2">
+          <button onClick={onClose} className="px-5 py-2.5 rounded-full text-[14px] font-semibold text-text-muted border border-border hover:bg-page transition-colors">Cancel</button>
+          <button
+            onClick={() => onSave(form)}
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-full text-[14px] font-semibold hover:bg-primary-hover transition-colors shadow-sm"
+          >
+            <Check size={15} /> Save Entry
           </button>
         </div>
       </motion.div>

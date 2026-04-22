@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   FolderPlus, Calendar, Layout as LayoutIcon, BarChart3, Filter, Grid, List, ChevronDown, Check
 } from 'lucide-react';
-import type { JiraProject, JiraTask } from '../../types/jira';
-import { JIRA_STORAGE_KEYS } from '../../types/jira';
 
 const ProjectCard = ({
   title,
@@ -194,7 +192,6 @@ interface Project {
   activities: number;
   startDate: string;
   priority: string;
-  isJira?: boolean; // Optional property
 }
 
 const MOCK_PROJECTS: Project[] = [
@@ -272,63 +269,16 @@ const MOCK_PROJECTS: Project[] = [
   }
 ];
 
-const readJson = <T,>(key: string, fallback: T): T => {
-  const raw = localStorage.getItem(key);
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-};
-
-const mapJiraProjects = (projects: JiraProject[], tasks: JiraTask[]): Project[] => {
-  return projects.map(project => {
-    const projectTasks = tasks.filter(task => task.projectKey === project.key);
-    const completed = projectTasks.filter(task => /done|complete|closed/i.test(task.status)).length;
-    const progress = projectTasks.length > 0 ? Math.round((completed / projectTasks.length) * 100) : 0;
-    const nextDue = projectTasks.find(task => task.due !== 'TBD')?.due ?? 'TBD';
-
-    return {
-      id: `jira-${project.key}`,
-      title: `[Jira] ${project.name}`,
-      description: `${project.key} · ${project.projectTypeKey ?? 'Jira project'}`,
-      status: progress === 100 && projectTasks.length > 0 ? 'Completed' : 'In Progress',
-      deadline: nextDue,
-      progress,
-      tasks: projectTasks.length,
-      activities: projectTasks.length,
-      startDate: 'Synced from Jira',
-      priority: 'Medium',
-      isJira: true,
-    };
-  });
-};
-
 const Projects = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeStatus, setActiveStatus] = useState('All Status');
-  const [jiraConnected, setJiraConnected] = useState(localStorage.getItem('jira_connected') === 'true');
-  const [jiraProjects, setJiraProjects] = useState<Project[]>(() => mapJiraProjects(
-    readJson<JiraProject[]>(JIRA_STORAGE_KEYS.projects, []),
-    readJson<JiraTask[]>(JIRA_STORAGE_KEYS.tasks, []),
-  ));
   const filterRef = useRef<HTMLDivElement>(null);
 
   const statuses = ['All Status', 'In Progress', 'Pending', 'Completed', 'Planning', 'On Hold'];
 
   useEffect(() => {
-    const handleStorage = () => {
-      setJiraConnected(localStorage.getItem(JIRA_STORAGE_KEYS.connected) === 'true');
-      setJiraProjects(mapJiraProjects(
-        readJson<JiraProject[]>(JIRA_STORAGE_KEYS.projects, []),
-        readJson<JiraTask[]>(JIRA_STORAGE_KEYS.tasks, []),
-      ));
-    };
-    window.addEventListener('storage', handleStorage);
-    
     const handleClickOutside = (event: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
         setFilterOpen(false);
@@ -336,23 +286,13 @@ const Projects = () => {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      window.removeEventListener('storage', handleStorage);
       document.removeEventListener('mousedown', handleClickOutside);
     }
   }, []);
 
-  const allProjects = jiraConnected ? [...MOCK_PROJECTS, ...jiraProjects] : MOCK_PROJECTS;
-
-  const [activeSource, setActiveSource] = useState('All Sources');
-  const sources = ['All Sources', 'Local', 'Jira'];
-
-  const filteredProjects = allProjects.filter(p => {
-    const matchesStatus = activeStatus === 'All Status' || p.status === activeStatus;
-    const matchesSource = activeSource === 'All Sources' || 
-                         (activeSource === 'Jira' && p.isJira) || 
-                         (activeSource === 'Local' && !p.isJira);
-    return matchesStatus && matchesSource;
-  });
+  const filteredProjects = MOCK_PROJECTS.filter(
+    (project) => activeStatus === 'All Status' || project.status === activeStatus,
+  );
 
   return (
     <Layout>
@@ -412,19 +352,6 @@ const Projects = () => {
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Source Filter */}
-            <div className="bg-card border border-border rounded-full p-1 flex gap-1">
-              {sources.map(s => (
-                <button
-                  key={s}
-                  onClick={() => setActiveSource(s)}
-                  className={`px-4 py-1.5 rounded-full text-[13px] font-bold transition-all ${activeSource === s ? 'bg-primary text-white' : 'text-text-muted hover:text-text-main'}`}
-                >
-                  {s}
-                </button>
-              ))}
             </div>
 
             <button

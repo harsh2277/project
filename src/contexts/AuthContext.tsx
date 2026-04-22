@@ -1,56 +1,116 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type {
   AuthContextType,
   Profile,
   ProfileUpdate,
+  Session,
   SignUpInput,
+  User,
   UserSettings,
   UserSettingsUpdate,
 } from '../types/auth';
-import type { Session, User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
 
-/* ─── Context ───────────────────────────────────────────────── */
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-/* ─── Helper: load profile row ─────────────────────────────── */
-async function fetchProfile(userId: string): Promise<Profile | null> {
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, email, first_name, last_name, avatar_url, job_title, company_name, bio, terms_accepted_at, onboarding_completed, created_at, updated_at')
-      .eq('id', userId)
-      .single();
-    if (error) {
-      console.warn('[AuthContext] fetchProfile error:', error.code, error.message);
-      return null;
-    }
-    return data as Profile;
-  } catch (e) {
-    console.warn('[AuthContext] fetchProfile threw:', e);
-    return null;
-  }
+const STORAGE_KEYS = {
+  accounts: 'proflow_local_accounts',
+  session: 'proflow_local_session',
+};
+
+interface StoredAccount {
+  user: User;
+  password: string;
+  profile: Profile;
+  settings: UserSettings;
 }
 
-async function fetchSettings(userId: string): Promise<UserSettings | null> {
-  try {
-    const { data, error } = await supabase
-      .from('user_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    if (error) {
-      console.warn('[AuthContext] fetchSettings error:', error.message);
-      return null;
-    }
-    return data as UserSettings;
-  } catch (e) {
-    console.warn('[AuthContext] fetchSettings threw:', e);
-    return null;
-  }
-}
+const nowIso = () => new Date().toISOString();
 
-/* ─── Provider ──────────────────────────────────────────────── */
+const buildAvatarUrl = (firstName: string, lastName: string, email: string) => {
+  const displayName = [firstName, lastName].filter(Boolean).join(' ') || email;
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=FBBF24&color=fff`;
+};
+
+const createAccount = (input: {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}): StoredAccount => {
+  const timestamp = nowIso();
+  const user: User = {
+    id: crypto.randomUUID(),
+    email: input.email.trim().toLowerCase(),
+    user_metadata: {
+      first_name: input.firstName,
+      last_name: input.lastName,
+    },
+  };
+
+  return {
+    user,
+    password: input.password,
+    profile: {
+      id: user.id,
+      email: user.email,
+      first_name: input.firstName,
+      last_name: input.lastName,
+      avatar_url: buildAvatarUrl(input.firstName, input.lastName, user.email),
+      job_title: 'Member',
+      company_name: 'Sellora',
+      bio: null,
+      terms_accepted_at: timestamp,
+      onboarding_completed: false,
+      created_at: timestamp,
+      updated_at: timestamp,
+    },
+    settings: {
+      user_id: user.id,
+      theme: 'light',
+      email_notifications: true,
+      push_notifications: false,
+      two_factor_enabled: false,
+      timezone: 'Asia/Kolkata',
+      language: 'en-US',
+      created_at: timestamp,
+      updated_at: timestamp,
+    },
+  };
+};
+
+const readAccounts = (): StoredAccount[] => {
+  const raw = localStorage.getItem(STORAGE_KEYS.accounts);
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) as StoredAccount[];
+  } catch {
+    return [];
+  }
+};
+
+const writeAccounts = (accounts: StoredAccount[]) => {
+  localStorage.setItem(STORAGE_KEYS.accounts, JSON.stringify(accounts));
+};
+
+const buildSession = (user: User): Session => ({
+  user,
+  access_token: `local-${user.id}`,
+});
+
+const ensureSeedAccount = () => {
+  const existing = readAccounts();
+  if (existing.length > 0) return existing;
+
+  const seed = createAccount({
+    email: 'demo@sellora.app',
+    password: 'demo12345',
+    firstName: 'Demo',
+    lastName: 'User',
+  });
+  writeAccounts([seed]);
+  return [seed];
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -59,154 +119,140 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    const accounts = ensureSeedAccount();
+    const rawSession = localStorage.getItem(STORAGE_KEYS.session);
 
-    /**
-     * onAuthStateChange fires INITIAL_SESSION on mount by reading localStorage
-     * directly — no network needed when the token is still valid.
-     * If the token is expired, Supabase refreshes it in the background and
-     * fires TOKEN_REFRESHED once done. We never clear the session on timeout.
-     */
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, s) => {
-        if (!mounted) return;
-
-        setSession(s);
-        setUser(s?.user ?? null);
-
-        if (s?.user) {
-          const [p, userSettings] = await Promise.all([
-            fetchProfile(s.user.id),
-            fetchSettings(s.user.id),
-          ]);
-          if (mounted) setProfile(p);
-          if (mounted) setSettings(userSettings);
+    if (rawSession) {
+      try {
+        const storedSession = JSON.parse(rawSession) as Session;
+        const account = accounts.find(({ user: accountUser }) => accountUser.id === storedSession.user.id);
+        if (account) {
+          setSession(buildSession(account.user));
+          setUser(account.user);
+          setProfile(account.profile);
+          setSettings(account.settings);
         } else {
-          // Clear profile only on explicit sign-out
-          if (event === 'SIGNED_OUT') {
-            setProfile(null);
-            setSettings(null);
-          }
+          localStorage.removeItem(STORAGE_KEYS.session);
         }
+      } catch {
+        localStorage.removeItem(STORAGE_KEYS.session);
+      }
+    }
 
-        // End the spinner once we have any auth answer
-        if (mounted) setLoading(false);
-      },
+    setLoading(false);
+  }, []);
+
+  const signIn = useCallback(async (email: string, password: string) => {
+    const account = readAccounts().find(
+      (item) => item.user.email === email.trim().toLowerCase() && item.password === password,
     );
 
-    /**
-     * getSession() is called here only to TRIGGER the INITIAL_SESSION event
-     * on the listener above (required by Supabase JS v2).
-     * We don't use its return value for session state — onAuthStateChange owns that.
-     * Errors here are non-fatal; the 10-sec fallback below will end loading if needed.
-     */
-    supabase.auth.getSession().catch((err) => {
-      console.error('[AuthContext] getSession error:', err);
-    });
+    if (!account) {
+      throw new Error('Invalid email or password.');
+    }
 
-    // Last-resort fallback: if onAuthStateChange never fires (e.g. network is
-    // completely down), stop the spinner after 10 s so the user sees the login page.
-    // We do NOT clear session here — if Supabase comes back online it will fire
-    // TOKEN_REFRESHED and restore the session automatically.
-    const fallback = setTimeout(() => {
-      if (mounted) setLoading(false);
-    }, 10_000);
-
-    return () => {
-      mounted = false;
-      clearTimeout(fallback);
-      listener.subscription.unsubscribe();
-    };
+    const nextSession = buildSession(account.user);
+    localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(nextSession));
+    setSession(nextSession);
+    setUser(account.user);
+    setProfile(account.profile);
+    setSettings(account.settings);
   }, []);
 
-  /* signIn */
-  const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw new Error(error.message);
-  }, []);
-
-  /* signUp */
   const signUp = useCallback(async (input: SignUpInput) => {
-    const firstName = input.firstName.trim();
-    const lastName = input.lastName.trim();
-    const fullName = `${firstName} ${lastName}`.trim();
-    const { error } = await supabase.auth.signUp({
-      email: input.email,
+    const accounts = readAccounts();
+    const email = input.email.trim().toLowerCase();
+
+    if (accounts.some((account) => account.user.email === email)) {
+      throw new Error('An account with this email already exists.');
+    }
+
+    const account = createAccount({
+      email,
       password: input.password,
-      options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          full_name: fullName,
-          terms_accepted: input.termsAccepted,
-        },
-      },
+      firstName: input.firstName.trim(),
+      lastName: input.lastName.trim(),
     });
-    if (error) throw new Error(error.message);
+
+    const nextAccounts = [...accounts, account];
+    writeAccounts(nextAccounts);
   }, []);
 
-  /* signOut — clears local state immediately so PublicRoute sees session=null
-     before the Supabase network round-trip completes */
   const signOut = useCallback(async () => {
-    // 1. Wipe local state right away (synchronous) so the UI reacts instantly
+    localStorage.removeItem(STORAGE_KEYS.session);
     setSession(null);
     setUser(null);
     setProfile(null);
     setSettings(null);
-    // 2. Tell Supabase to invalidate the server-side token (async, non-blocking)
-    const { error } = await supabase.auth.signOut();
-    if (error) console.error('[AuthContext] signOut error:', error.message);
   }, []);
 
-  /* resetPassword */
   const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
-    });
-    if (error) throw new Error(error.message);
+    if (!email.trim()) {
+      throw new Error('Email is required.');
+    }
   }, []);
 
-  /* updateProfile — always UPDATE (row is guaranteed by the signup trigger) */
-  const updateProfile = useCallback(
-    async (data: ProfileUpdate) => {
-      if (!user) throw new Error('No authenticated user');
+  const updateProfile = useCallback(async (data: ProfileUpdate) => {
+    if (!user || !profile) throw new Error('No authenticated user');
 
-      const { error } = await supabase
-        .from('profiles')
-        .update(data)
-        .eq('id', user.id);
+    const accounts = readAccounts();
+    const nextProfile: Profile = {
+      ...profile,
+      ...data,
+      updated_at: nowIso(),
+    };
+    nextProfile.avatar_url =
+      nextProfile.avatar_url ??
+      buildAvatarUrl(nextProfile.first_name ?? '', nextProfile.last_name ?? '', user.email);
 
-      if (error) {
-        console.error('[AuthContext] updateProfile error:', error.code, error.message, error.details);
-        throw new Error(error.message);
-      }
+    const nextAccounts = accounts.map((account) =>
+      account.user.id === user.id
+        ? {
+            ...account,
+            user: {
+              ...account.user,
+              user_metadata: {
+                ...account.user.user_metadata,
+                first_name: nextProfile.first_name,
+                last_name: nextProfile.last_name,
+              },
+            },
+            profile: nextProfile,
+          }
+        : account,
+    );
 
-      // Re-fetch so local state matches the DB
-      const p = await fetchProfile(user.id);
-      if (p) setProfile(p);
-    },
-    [user],
-  );
+    writeAccounts(nextAccounts);
 
-  /* updateSettings — upsert because settings row may not exist on older accounts */
-  const updateSettings = useCallback(
-    async (data: UserSettingsUpdate) => {
-      if (!user) throw new Error('No authenticated user');
+    const nextUser = nextAccounts.find((account) => account.user.id === user.id)?.user ?? user;
+    const nextSession = buildSession(nextUser);
+    localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(nextSession));
+    setUser(nextUser);
+    setSession(nextSession);
+    setProfile(nextProfile);
+  }, [profile, user]);
 
-      const { error } = await supabase
-        .from('user_settings')
-        .upsert({ user_id: user.id, ...data }, { onConflict: 'user_id' });
+  const updateSettings = useCallback(async (data: UserSettingsUpdate) => {
+    if (!user || !settings) throw new Error('No authenticated user');
 
-      if (error) {
-        console.error('[AuthContext] updateSettings error:', error.code, error.message, error.details);
-        throw new Error(error.message);
-      }
+    const nextSettings: UserSettings = {
+      ...settings,
+      ...data,
+      updated_at: nowIso(),
+    };
 
-      const userSettings = await fetchSettings(user.id);
-      if (userSettings) setSettings(userSettings);
-    },
-    [user],
-  );
+    const nextAccounts = readAccounts().map((account) =>
+      account.user.id === user.id
+        ? {
+            ...account,
+            settings: nextSettings,
+          }
+        : account,
+    );
+
+    writeAccounts(nextAccounts);
+    setSettings(nextSettings);
+  }, [settings, user]);
 
   const value: AuthContextType = {
     session,
@@ -225,7 +271,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-/* ─── Hook ──────────────────────────────────────────────────── */
 export const useAuth = (): AuthContextType => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within an AuthProvider');

@@ -3,7 +3,7 @@ import {
   LayoutDashboard, FolderDot, CheckSquare, Calendar,
   Zap, Settings, Search, BarChart3,
   Bell, PanelLeftClose, PanelLeftOpen, User, LogOut, ChevronDown, Plus,
-  Timer, FileText, Plug, Sun, Moon
+  Timer, FileText, Sun, Moon
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -80,7 +80,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const handleSignOut = async () => {
     setIsProfileMenuOpen(false);
-    // signOut() clears session state synchronously then invalidates the Supabase token
+    // signOut() clears local session state synchronously so navigation updates immediately
     await signOut();
     // Navigate AFTER state is cleared so PublicRoute sees session===null
     navigate('/login', { replace: true });
@@ -113,7 +113,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <SidebarItem icon={Calendar} label="Calendar" path="/calendar" active={location.pathname === '/calendar'} isCollapsed={isSidebarCollapsed} />
               <SidebarItem icon={Timer} label="Timer" path="/timer" active={location.pathname === '/timer'} isCollapsed={isSidebarCollapsed} />
               <SidebarItem icon={FileText} label="Timesheet" path="/timesheet" active={location.pathname === '/timesheet'} isCollapsed={isSidebarCollapsed} />
-              <SidebarItem icon={Plug} label="Integrations" path="/integrations" active={location.pathname === '/integrations'} isCollapsed={isSidebarCollapsed} />
             </div>
           </div>
         </div>

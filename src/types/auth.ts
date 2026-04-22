@@ -1,4 +1,13 @@
-import type { Session, User } from '@supabase/supabase-js';
+export interface User {
+  id: string;
+  email: string;
+  user_metadata?: Record<string, unknown>;
+}
+
+export interface Session {
+  user: User;
+  access_token: string;
+}
 
 export interface Profile {
   id: string;
@@ -73,5 +82,3 @@ export interface AuthContextType {
   updateProfile: (data: ProfileUpdate) => Promise<void>;
   updateSettings: (data: UserSettingsUpdate) => Promise<void>;
 }
-
-export type { Session, User };

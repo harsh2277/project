@@ -19,7 +19,6 @@ import Tasks from './pages/app/Tasks';
 import CalendarPage from './pages/app/Calendar';
 import TimerPage from './pages/app/Timer';
 import TimesheetPage from './pages/app/Timesheet';
-import Integrations from './pages/app/Integrations';
 import Settings from './pages/app/Settings';
 
 import './App.css';
@@ -123,14 +122,6 @@ function App() {
           element={
             <ProtectedRoute>
               <TimesheetPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/integrations"
-          element={
-            <ProtectedRoute>
-              <Integrations />
             </ProtectedRoute>
           }
         />

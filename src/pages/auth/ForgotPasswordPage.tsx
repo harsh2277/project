@@ -55,7 +55,7 @@ const ForgotPasswordPage: React.FC = () => {
             Forgot Password?
           </h1>
           <p className="text-[14px] text-text-muted mb-8">
-            No worries! Enter your email and we'll send you a reset link right away.
+            This local build does not send email. Enter your account email and we will confirm the request in-app.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -198,15 +198,15 @@ const ForgotPasswordPage: React.FC = () => {
                   <CheckCircle className="w-8 h-8 text-primary" strokeWidth={1.8} />
                 </motion.div>
 
-                <h2 className="text-[22px] font-bold text-text-main mb-2">Check your inbox!</h2>
+                <h2 className="text-[22px] font-bold text-text-main mb-2">Request recorded</h2>
                 <p className="text-[13px] text-text-muted leading-relaxed mb-1">
-                  We've sent a password reset link to
+                  Password reset is not connected to an email backend in this local build for
                 </p>
                 <p className="text-primary font-semibold text-[13px] mb-4 truncate max-w-full px-2">
                   {email}
                 </p>
                 <p className="text-[12px] text-text-muted mb-7">
-                  Didn't receive it? Check your spam folder or try again in a few minutes.
+                  Create a new local account from the sign-up page if you need a fresh login.
                 </p>
 
                 {/* Actions */}

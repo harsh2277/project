@@ -53,7 +53,8 @@ const LoginPage: React.FC = () => {
         {/* Form */}
         <div className="w-full max-w-[380px] mx-auto">
           <h1 className="text-[30px] font-bold text-text-main mb-1.5 leading-tight">Welcome Back</h1>
-          <p className="text-[14px] text-text-muted mb-8">Enter your email and password to access your account.</p>
+          <p className="text-[14px] text-text-muted mb-3">Enter your email and password to access your account.</p>
+          <p className="text-[13px] text-primary font-semibold mb-8">Demo account: demo@sellora.app / demo12345</p>
 
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Error banner */}

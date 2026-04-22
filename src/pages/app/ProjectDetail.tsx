@@ -6,8 +6,7 @@ import {
   ArrowLeft, Plus, MoreHorizontal, Calendar, MessageSquare,
   GripHorizontal, Activity, Target, Clock, FileText,
   CheckCircle2, DownloadCloud, Search, UploadCloud, Check,
-  Paperclip, Pencil, X, ChevronDown, Flag, Trash2, Edit2, AlertTriangle,
-  Settings, Link2, RefreshCw, Bug, ShieldCheck, User2, Loader2, ArrowRight
+  Paperclip, Pencil, X, ChevronDown, Flag, Trash2, Edit2, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
@@ -389,20 +388,6 @@ const DeleteProjectModal = ({
   );
 };
 
-const MOCK_JIRA_PROJECTS = [
-  { name: 'Marketing Web', key: 'MKT', id: 'mkt-1' },
-  { name: 'Mobile App', key: 'APP', id: 'app-2' },
-  { name: 'Design System', key: 'DS', id: 'ds-3' },
-  { name: 'Core Infrastructure', key: 'INF', id: 'inf-4' },
-];
-
-const MOCK_JIRA_TASKS = [
-  { id: 'ABC-123', title: 'Implement dynamic hero section', status: 'In Progress', assignee: 'Alex Lee', priority: 'High', date: 'Today' },
-  { id: 'ABC-124', title: 'Fix navigation overflow on mobile', status: 'To Do', assignee: 'Sarah A.', priority: 'Medium', date: 'Tomorrow' },
-  { id: 'ABC-125', title: 'Add performance monitoring', status: 'Done', assignee: 'Tony M.', priority: 'Low', date: 'Yesterday' },
-  { id: 'ABC-126', title: 'Update dependencies to v4', status: 'In Review', assignee: 'Alex Lee', priority: 'High', date: '2 days ago' },
-];
-
 /* ─── Component ─────────────────────────────────────────────── */
 const ProjectDetail = () => {
   const navigate = useNavigate();
@@ -410,14 +395,6 @@ const ProjectDetail = () => {
   const [data, setData] = useState(initialData);
   const [activeTab, setActiveTab] = useState('Overview');
 
-  // Jira Integration States
-  const [isJiraIntegrated, setIsJiraIntegrated] = useState(localStorage.getItem('jira_connected') === 'true');
-  const [isLinkingJira, setIsLinkingJira] = useState(false);
-  const [linkedJiraProject, setLinkedJiraProject] = useState<any>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [lastSync, setLastSync] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-  const [showJiraLinkModal, setShowJiraLinkModal] = useState(false);
-  const [syncError, setSyncError] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskForm, setTaskForm] = useState({ title: '', tag: 'Design', status: 'To Do', date: '', comments: '' });
   const [activeKanbanTask, setActiveKanbanTask] = useState<{ task: any; columnTitle: string } | null>(null);
@@ -462,6 +439,8 @@ const ProjectDetail = () => {
       },
     });
   };
+
+  const projectTasks = Object.values(data.tasks);
 
   return (
     <Layout>
@@ -840,148 +819,51 @@ const ProjectDetail = () => {
         )}
 
         {/* ══════════════════════════════════════════════════════
-            TASKS TAB (Jira Integrated)
+            TASKS TAB
         ══════════════════════════════════════════════════════ */}
         {activeTab === 'Tasks' && (
           <div className="flex flex-col h-full bg-card rounded-[24px] border border-border overflow-hidden">
-            {/* Toolbar */}
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-md sticky top-0 z-10">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg">
-                  <Bug size={16} />
-                  <span className="text-xs font-bold uppercase tracking-wider">Jira Active</span>
-                </div>
-                  <div className="h-6 w-px bg-border" />
-                <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
-                  {isSyncing ? (
-                    <span className="flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> Syncing with Jira...</span>
-                  ) : (
-                    <span className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-600" /> Synced at {lastSync}</span>
-                  )}
-                </div>
+              <div>
+                <h2 className="text-[16px] font-bold text-text-main">Project Tasks</h2>
+                <p className="text-[13px] font-medium text-text-muted mt-1">
+                  {projectTasks.length} tasks tracked locally in this project board.
+                </p>
               </div>
-
-              <div className="flex items-center gap-2">
-                 <button
-                   onClick={() => {
-                     setIsSyncing(true);
-                     setTimeout(() => {
-                       setIsSyncing(false);
-                       setLastSync(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-                     }, 1500);
-                   }}
-                   disabled={isSyncing}
-                   className="p-2 text-text-muted hover:text-text-main hover:bg-page rounded-xl transition-all"
-                 >
-                   <RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
-                 </button>
-                 <div className="relative">
-                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-border" />
-                   <input
-                     type="text"
-                     placeholder="Search Jira issues..."
-                     className="pl-9 pr-4 py-2 bg-page border-none rounded-xl text-sm focus:ring-1 focus:ring-primary/20 w-64 outline-none"
-                   />
-                 </div>
-                 <button
-                   onClick={() => setShowTaskModal(true)}
-                   className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary-hover transition-colors shadow-lg"
-                 >
-                   <Plus size={16} /> Create Task
-                 </button>
-              </div>
+              <button
+                onClick={() => setShowTaskModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary-hover transition-colors shadow-lg"
+              >
+                <Plus size={16} /> Create Task
+              </button>
             </div>
 
-            {/* Task List */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-               {!linkedJiraProject ? (
-                 <div className="h-full flex flex-col items-center justify-center text-center p-8 space-y-4">
-                   <div className="w-16 h-16 bg-primary/10 text-primary rounded-[20px] flex items-center justify-center">
-                     <Link2 size={32} />
-                   </div>
-                   <div>
-                     <h3 className="text-lg font-bold text-text-main">No Jira Project Linked</h3>
-                     <p className="text-sm text-text-muted max-w-xs mx-auto mt-2">
-                       Connect a Jira project to this project to start syncing issues and tracking progress natively.
-                     </p>
-                   </div>
+              {projectTasks.map((task) => (
+                <motion.div
+                  key={task.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-card p-4 rounded-2xl border border-border hover:border-primary/50 hover:shadow-md transition-all group flex items-center justify-between cursor-pointer"
+                >
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${getTagStyle(task.tag)}`}>
+                      {task.tag}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">{task.content}</h4>
+                      <p className="text-[12px] text-text-muted mt-1">Due {task.date} · {task.comments} comments</p>
+                    </div>
+                  </div>
+
                   <button
-                    onClick={() => navigate('/integrations')}
-                    className="px-6 py-2.5 bg-primary text-white rounded-full text-sm font-bold hover:bg-primary-hover transition-all"
+                    onClick={() => setActiveKanbanTask({ task, columnTitle: 'Project Tasks' })}
+                    className="px-4 py-2 rounded-xl text-[12px] font-bold text-text-main border border-border hover:bg-page transition-colors"
                   >
-                    Go to Integrations
+                    View
                   </button>
-                </div>
-               ) : syncError ? (
-                 <div className="h-full flex flex-col items-center justify-center text-center p-8 space-y-4">
-                   <div className="w-16 h-16 bg-rose-500/10 text-rose-600 rounded-[20px] flex items-center justify-center">
-                     <AlertTriangle size={32} />
-                   </div>
-                   <div>
-                     <h3 className="text-lg font-bold text-text-main">Unable to fetch Jira tasks</h3>
-                     <p className="text-sm text-text-muted max-w-xs mx-auto mt-2">
-                       There was a problem communicating with Atlassian. Please try reconnecting your account.
-                     </p>
-                   </div>
-                  <button
-                    onClick={() => navigate('/integrations')}
-                    className="px-6 py-2.5 bg-rose-600 text-white rounded-full text-sm font-bold hover:bg-rose-700 transition-all"
-                  >
-                    Reconnect Jira
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {MOCK_JIRA_TASKS.map(task => (
-                     <motion.div
-                       key={task.id}
-                       initial={{ opacity: 0, y: 10 }}
-                       animate={{ opacity: 1, y: 0 }}
-                       className="bg-card p-4 rounded-2xl border border-border hover:border-primary/50 hover:shadow-md transition-all group flex items-center justify-between cursor-pointer"
-                     >
-                       <div className="flex items-center gap-4 flex-1">
-                         <div className="w-10 h-10 rounded-xl bg-page flex items-center justify-center text-primary border border-border">
-                           <Bug size={20} />
-                         </div>
-                         <div>
-                           <p className="text-[12px] font-black text-primary uppercase tracking-tighter mb-0.5">{task.id}</p>
-                           <h4 className="text-sm font-bold text-text-main group-hover:text-primary transition-colors">{task.title}</h4>
-                         </div>
-                       </div>
-
-                      <div className="flex items-center gap-6">
-                        <div className="flex flex-col items-end">
-                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${task.status === 'Done' ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' :
-                               task.status === 'In Progress' ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' :
-                                 'bg-page text-text-muted border border-border'
-                             }`}>
-                            {task.status}
-                           </span>
-                           <span className="text-[10px] font-medium text-text-muted mt-1">{task.date}</span>
-                        </div>
-
-                         <div className="flex flex-col items-end w-24">
-                           <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${task.priority === 'High' ? 'text-rose-600' : 'text-text-muted'
-                             }`}>
-                             {task.priority} Priority
-                           </span>
-                         </div>
-
-                         <div className="flex -space-x-2">
-                           <img src={`https://ui-avatars.com/api/?name=${task.assignee}&background=random&color=fff`} className="w-8 h-8 rounded-full border-2 border-border ring-1 ring-border" />
-                         </div>
- 
-                         <button className="p-2 text-text-muted hover:text-text-main rounded-lg hover:bg-page">
-                           <MoreHorizontal size={16} />
-                         </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                   <div className="py-8 text-center">
-                     <p className="text-xs font-bold text-border uppercase tracking-widest">End of Sync</p>
-                   </div>
-                </>
-              )}
+                </motion.div>
+              ))}
             </div>
           </div>
         )}
@@ -1146,77 +1028,6 @@ const ProjectDetail = () => {
         )}
       </div>
 
-      {/* ── Jira Link Modal ── */}
-      <AnimatePresence>
-        {showJiraLinkModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowJiraLinkModal(false)}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-            />
-             <motion.div
-               initial={{ scale: 0.9, opacity: 0, y: 20 }}
-               animate={{ scale: 1, opacity: 1, y: 0 }}
-               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-               className="bg-card rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl relative z-10 border border-border"
-             >
-               <div className="p-8">
-                 <div className="flex justify-between items-center mb-6">
-                   <h2 className="text-xl font-black text-text-main">Link Jira Project</h2>
-                   <button onClick={() => setShowJiraLinkModal(false)} className="p-2 hover:bg-page rounded-full text-text-muted selection:bg-primary/20"><X size={20} /></button>
-                 </div>
-
-                <div className="space-y-6">
-                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-                    <input
-                      type="text"
-                      placeholder="Search Jira projects..."
-                      className="w-full bg-transparent border border-border rounded-2xl pl-12 pr-5 py-4 text-sm font-medium outline-none focus:border-primary transition-all text-text-main placeholder:text-text-muted"
-                      style={{ background: 'transparent' }}
-                    />
-                  </div>
-
-                  <div className="max-h-60 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                    {MOCK_JIRA_PROJECTS.map(p => (
-                       <button
-                         key={p.id}
-                         onClick={() => {
-                           setLinkedJiraProject(p);
-                           setShowJiraLinkModal(false);
-                           setActiveTab('Tasks');
-                         }}
-                         className="w-full p-4 rounded-2xl border border-border text-left hover:border-primary/50 hover:bg-primary/5 transition-all flex items-center justify-between group"
-                       >
-                         <div className="flex items-center gap-3">
-                           <div className="w-10 h-10 bg-card shadow-sm rounded-xl flex items-center justify-center text-text-main font-black text-xs border border-border">
-                             {p.key}
-                           </div>
-                           <div>
-                             <p className="text-sm font-bold text-text-main">{p.name}</p>
-                             <p className="text-xs text-text-muted font-medium">{p.key} Project Key</p>
-                           </div>
-                         </div>
-                         <ArrowRight size={16} className="text-text-muted group-hover:text-primary transition-colors" />
-                       </button>
-                    ))}
-                  </div>
-
-                   <div className="pt-2 text-center">
-                    <p className="text-xs font-medium text-text-muted">
-                      Can't find your project? <span className="text-primary font-bold cursor-pointer">Re-sync Jira</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
       {/* ── Kanban Task Drawer — rendered via portal so it always escapes overflow/stacking ── */}
       {activeKanbanTask && ReactDOM.createPortal(
         <KanbanTaskDrawer
@@ -1355,11 +1166,8 @@ const ProjectDetail = () => {
                </div>
 
               {activeTab === 'Tasks' && (
-                <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center text-primary shadow-sm">
-                    <Bug size={16} />
-                  </div>
-                  <p className="text-xs font-bold text-primary">Note: This task will be created directly in Jira.</p>
+                <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl">
+                  <p className="text-xs font-bold text-primary">New tasks are stored locally on this project board.</p>
                 </div>
               )}
             </div>
